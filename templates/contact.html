@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block title %}Contact — CyberShield Academy{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
+
+<!-- HERO -->
+<section class="contact-hero"><br><br><br>
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    <span class="badge-label">SECURE CHANNEL</span>
+    <br/>
+    <span class="badge-sub">ACTIVE</span>
+  </div>
+  <h1>Get in touch with our experts.</h1>
+  <p>Whether you're looking for enterprise training, technical lab support, or general inquiries, our defensive team is ready to assist.</p>
+</section>
+
+<!-- MAIN GRID -->
+<section class="contact-grid">
+
+  <!-- LEFT: Form -->
+  <div class="form-panel">
+    <div class="form-panel-head">
+      <span class="lock-icon">🔒</span>
+      <span>Secure Transmission</span>
+    </div>
+    <div class="form-divider"></div>
+
+    <form class="contact-form"
+  method="POST"
+  action="{{ url_for('contact') }}">
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">
+          {% if category == 'success' %}✓{% else %}⚠{% endif %}
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="form-row two-col">
+    <div class="form-group">
+      <label>FULL NAME</label>
+      <input
+        type="text"
+        name="full_name"
+        placeholder="e.g. Alex Cipher"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label>EMAIL ADDRESS</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="alex@company.com"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>SUBJECT</label>
+    <div class="select-wrap">
+      <select name="subject" required>
+        <option value="">— Select a subject —</option>
+        <option value="Enterprise Training Inquiry">Enterprise Training Inquiry</option>
+        <option value="Technical Lab Support">Technical Lab Support</option>
+        <option value="General Inquiry">General Inquiry</option>
+        <option value="Partnership Opportunities">Partnership Opportunities</option>
+        <option value="Security Bug Report">Security Bug Report</option>
+      </select>
+      <span class="select-arrow">›</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>ENCRYPTED MESSAGE</label>
+    <textarea
+      name="message"
+      placeholder="Describe your request in detail..."
+      required
+      minlength="10">
+    </textarea>
+  </div>
+
+  <button class="btn-send" type="submit">
+    Send Message
+    <span class="send-icon">▷</span>
+  </button>
+
+</form>
+  </div>
+
+  <!-- RIGHT: Info + Map -->
+  <div class="info-panel">
+
+    <div class="info-block">
+      <span class="info-block-title">DIRECT CONTACT</span>
+      <div class="info-row">
+        <div class="info-icon">✉</div>
+        <div>
+          <div class="info-label">Email Support</div>
+          <div class="info-value">paulndeh86@gmail.com</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📞</div>
+        <div>
+          <div class="info-label">Global Hotline</div>
+          <div class="info-value">+237 673 254 504</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-divider"></div>
+
+    <div class="info-block">
+      <span class="info-block-title">HEADQUARTERS</span>
+      <div class="info-row">
+        <div class="info-icon">📍</div>
+        <div>
+          <div class="info-label">Quatre Etage, Bonaberi</div>
+          <div class="info-value">Douala, Littoral<br/>Cameroon</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-wrap">
+      <img
+        src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80"
+        alt="Location Map"
+        class="map-img"/>
+      <div class="map-overlay"></div>
+      <div class="map-footer">
+        <span class="map-btn">LOCATE OFFICE</span>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="faq-header">
+    <div>
+      <h2>Frequently Asked Questions</h2>
+      <p>Quick answers to standard operating procedures.</p>
+    </div>
+    <a href="#" class="faq-kb-link">VIEW FULL KNOWLEDGE BASE ›</a>
+  </div>
+
+  <div class="faq-grid">
+
+    <div class="faq-card">
+      <div class="faq-q">
+        <span class="faq-dot"></span>
+        How do I enroll in Advanced Labs?
+      </div>
+      <p>Enrollment can be handled directly through your student dashboard under the 'Training' tab. For corporate bulk licenses, please contact our enterprise sales team via the form above.</p>
+    </div>
+
+    <div class="faq-card">
+      <div class="faq-q">
+        <span class="faq-dot"></span>
+        What is the average response time for technical support?
+      </div>
+      <p>Our SOC team operates 24/7. Standard technical support inquiries are typically addressed within 4 to 6 hours. Enterprise 'Priority One' tickets are handled within 30 minutes.</p>
+    </div>
+
+    <div class="faq-card">
+      <div class="faq-q">
+        <span class="faq-dot"></span>
+        Do you offer certification upon completion?
+      </div>
+      <p>Yes, all academy graduates receive a cryptographically signed digital certificate (NFT-based) that can be verified on the blockchain for permanent proof of skill.</p>
+    </div>
+
+    <div class="faq-card">
+      <div class="faq-q">
+        <span class="faq-dot"></span>
+        Can I cancel my subscription at any time?
+      </div>
+      <p>Subscriptions can be managed in your account settings. We offer a 7-day money-back guarantee for first-time students who haven't completed more than 10% of a module.</p>
+    </div>
+
+  </div>
+</section>
+
+
+{% endblock %}

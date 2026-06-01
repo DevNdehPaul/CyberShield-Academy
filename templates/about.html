@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}About — CyberShield Academy{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <span class="badge">⬡ MISSION PROTOCOL ACTIVATED</span>
+    <h1>Our Mission:<br><span class="cyan">Securing the Digital Frontier</span></h1>
+    <p>Born from the necessity of a rapidly evolving threat landscape, CyberShield Academy was founded to bridge the gap between theoretical knowledge and offensive security reality. We provide the tools, the battleground, and the expertise to transform aspiring researchers into elite defenders.</p>
+    <a href="#logs" class="btn-primary">VIEW_ACADEMY_LOGS</a>
+  </div>
+  <div class="hero-img">
+    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=900&q=80" alt="Operations Center"/>
+    <div class="hero-img-scan"></div>
+  </div>
+</section>
+
+<!-- MISSION / VISION -->
+<section class="mv-section">
+  <div class="mv-card">
+    <div class="mv-card-icon">🚀</div>
+    <div class="mv-card-bg-icon">◎</div>
+    <h3>Mission</h3>
+    <p>To forge the next generation of elite cyber defenders through immersive, hands-on training that mirrors the volatility of real-world digital warfare.</p>
+  </div>
+  <div class="mv-card">
+    <div class="mv-card-icon">❖</div>
+    <div class="mv-card-bg-icon">◎</div>
+    <h3>Vision</h3>
+    <p>A world where every digital boundary is fortified by expert knowledge, and organizations navigate the future with absolute security confidence.</p>
+  </div>
+</section>
+
+<!-- TEAM — single operator -->
+<section class="team-section">
+  <div class="team-header">
+    <span class="section-eyebrow">// THE OPERATOR</span>
+    <h2>The Architect Behind the Shield</h2>
+    <p>A single architect guiding the entire system.</p>
+  </div>
+
+  <div class="operator-card">
+    <div class="operator-img-wrap">
+      <img src="../static/images/Paul.jpeg" alt="Mr. Ndeh Paul"/>
+      <div class="operator-img-overlay"></div>
+      <div class="operator-scan-line"></div>
+      <span class="operator-role-tag">FOUNDER &amp; CHIEF ARCHITECT</span>
+      <div class="operator-corner tl"></div>
+      <div class="operator-corner tr"></div>
+      <div class="operator-corner bl"></div>
+      <div class="operator-corner br"></div>
+    </div>
+    <div class="operator-info">
+      <div class="operator-status">
+        <span class="status-dot"></span> ACTIVE
+      </div>
+      <h3>Mr. Ndeh Paul</h3>
+      <p class="operator-title">Founder &amp; Chief Architect</p>
+      <p class="operator-bio">20+ years in cryptographic research and former lead for national security infrastructure. Architect of the Maxwell-OS threat intelligence framework and founder of three successful security firms.</p>
+      <div class="operator-tags">
+        <span class="otag">Cryptography</span>
+        <span class="otag">Red Team</span>
+        <span class="otag">National Defense</span>
+        <span class="otag">Zero-Day Research</span>
+      </div>
+      <div class="operator-links">
+        <a href="#" class="olink">GitHub</a>
+        <a href="#" class="olink">LinkedIn</a>
+        <a href="#" class="olink">Publications</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="logs">
+  <div class="timeline-header">
+    <span class="section-eyebrow">// IMPACT LOG</span>
+    <h2>Our Impact Timeline</h2>
+    <div class="timeline-underline"></div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="tl-row">
+      <div class="tl-side left">
+        <div class="tl-card">
+          <div class="tl-num">50,000+</div>
+          <div class="tl-label">Students Trained</div>
+          <p>Building a global defense network of certified security professionals.</p>
+        </div>
+      </div>
+      <div class="tl-spine">
+        <div class="tl-dot"></div>
+      </div>
+      <div class="tl-side right">
+        <span class="tl-year">EST. 2020</span>
+      </div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-side left">
+        <span class="tl-year align-right">Q3 2022</span>
+      </div>
+      <div class="tl-spine">
+        <div class="tl-dot"></div>
+      </div>
+      <div class="tl-side right">
+        <div class="tl-card">
+          <div class="tl-num">100+</div>
+          <div class="tl-label">Corporate Partnerships</div>
+          <p>Powering the security teams of Fortune 500 enterprises and government agencies.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-side left">
+        <div class="tl-card">
+          <div class="tl-num cyan">Global CTF</div>
+          <div class="tl-label">Championships Won</div>
+          <p>Our community regularly tops the leaderboards at world-class security competitions.</p>
+        </div>
+      </div>
+      <div class="tl-spine">
+        <div class="tl-dot"></div>
+      </div>
+      <div class="tl-side right">
+        <span class="tl-year">CURRENT STATUS</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box">
+    <div class="cta-glow"></div>
+    <span class="section-eyebrow light">// READY TO DEPLOY</span>
+    <h2>Ready to join the elite?</h2>
+    <p>Your journey into deep-tech security starts here. Access our immersive labs and join a community of expert defenders.</p>
+    <div class="cta-buttons">
+      <a href="#" class="btn-primary">START_YOUR_TRAINING</a>
+      <a href="#" class="btn-outline">EXPLORE_COURSES</a>
+    </div>
+  </div>
+</section>
+
+
+
+{% endblock %}
