@@ -405,7 +405,7 @@ def admin_create_lab():
         flash(f'Lab "{title}" created.', 'success')
         return redirect(url_for('labs'))
 
-    return render_template('admin/lab_form.html')
+    return render_template('lab_form.html')
 
 # ── Admin: delete (deactivate) lab ──
 @app.route('/admin/labs/<int:lab_id>/delete', methods=['POST'])
@@ -448,7 +448,7 @@ def admin_create_event():
         flash(f'Live event "{title}" created.', 'success')
         return redirect(url_for('labs'))
 
-    return render_template('admin/event_form.html')
+    return render_template('event_form.html')
 
 # ── Courses listing ──
 @app.route('/courses')
@@ -570,9 +570,9 @@ def admin_create_course():
         db.session.add(course)
         db.session.commit()
         flash(f'Course "{title}" created.', 'success')
-        return redirect(url_for('courses'))
+        return redirect(url_for('admin_dashboard'))
 
-    return render_template('admin/course_form.html')
+    return render_template('course_form.html')
 
 # ── Admin: edit course ──
 @app.route('/admin/courses/<int:course_id>/edit', methods=['GET', 'POST'])
@@ -591,9 +591,9 @@ def admin_edit_course(course_id):
         course.image_url   = request.form.get('image_url', '').strip() or None
         db.session.commit()
         flash(f'Course "{course.title}" updated.', 'success')
-        return redirect(url_for('courses'))
+        return redirect(url_for('admin_dashboard'))
 
-    return render_template('admin/course_form.html', course=course)
+    return render_template('course_form.html', course=course)
 
 # ── Admin: delete course ──
 @app.route('/admin/courses/<int:course_id>/delete', methods=['POST'])
@@ -604,7 +604,107 @@ def admin_delete_course(course_id):
     db.session.delete(course)
     db.session.commit()
     flash(f'Course "{course.title}" deleted.', 'success')
-    return redirect(url_for('courses'))
+    return redirect(url_for('admin_dashboard'))
+
+# ── Admin: All students page ──
+@app.route('/admin/students')
+@login_required
+@admin_required
+def admin_students():
+    page     = request.args.get('page', 1, type=int)
+    per_page = 25
+
+    pagination = User.query.filter_by(role='student') \
+        .order_by(User.created_at.desc()) \
+        .paginate(page=page, per_page=per_page, error_out=False)
+
+    total_students   = User.query.filter_by(role='student').count()
+    active_students  = User.query.filter_by(role='student', is_active=True).count()
+    total_enrollments = Enrollment.query.count()
+    unread_count     = ContactMessage.query.filter_by(is_read=False).count()
+
+    return render_template('admin_students.html',
+        users             = pagination.items,
+        pagination        = pagination,
+        total_students    = total_students,
+        active_students   = active_students,
+        total_enrollments = total_enrollments,
+        unread_count      = unread_count,
+    )
+
+# ── Admin: edit lab ──
+@app.route('/admin/labs/<int:lab_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_edit_lab(lab_id):
+    lab = Lab.query.get_or_404(lab_id)
+
+    if request.method == 'POST':
+        lab.title       = request.form.get('title', lab.title).strip()
+        lab.description = request.form.get('description', lab.description).strip()
+        lab.category    = request.form.get('category', lab.category).strip()
+        lab.difficulty  = request.form.get('difficulty', lab.difficulty).strip()
+        lab.xp          = request.form.get('xp', lab.xp, type=int)
+        lab.duration    = request.form.get('duration', lab.duration, type=int)
+        lab.icon        = request.form.get('icon', lab.icon).strip()
+        lab.env_url     = request.form.get('env_url', '').strip() or None
+        tags_raw        = request.form.get('tags', '')
+        lab.tags        = [t.strip() for t in tags_raw.split(',') if t.strip()]
+        db.session.commit()
+        flash(f'Lab "{lab.title}" updated.', 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('lab_form.html', lab=lab)
+
+# ── Admin: edit live event ──
+@app.route('/admin/labs/event/<int:event_id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_edit_event(event_id):
+    event = LiveEvent.query.get_or_404(event_id)
+
+    if request.method == 'POST':
+        event.title       = request.form.get('title', event.title).strip()
+        event.description = request.form.get('description', event.description).strip()
+        event.xp_pool     = request.form.get('xp_pool', event.xp_pool, type=int)
+        ends_at_str       = request.form.get('ends_at', '').strip()
+
+        if ends_at_str:
+            try:
+                event.ends_at = datetime.fromisoformat(ends_at_str)
+            except ValueError:
+                flash('Invalid date format. Use YYYY-MM-DDTHH:MM.', 'error')
+                return redirect(url_for('admin_edit_event', event_id=event_id))
+
+        db.session.commit()
+        flash(f'Event "{event.title}" updated.', 'success')
+        return redirect(url_for('admin_dashboard'))
+
+    return render_template('event_form.html', event=event)
+
+# ── Admin: delete live event ──
+@app.route('/admin/labs/event/<int:event_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_event(event_id):
+    event = LiveEvent.query.get_or_404(event_id)
+    event.is_active = False
+    db.session.commit()
+    flash(f'Event "{event.title}" ended.', 'success')
+    return redirect(url_for('admin_dashboard'))
+
+# ── Admin: delete message ──
+# Add this route to your app.py alongside the other admin routes
+
+@app.route('/admin/messages/<int:msg_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_message(msg_id):
+    msg = ContactMessage.query.get_or_404(msg_id)
+    db.session.delete(msg)
+    db.session.commit()
+    flash('Message deleted.', 'success')
+    return redirect(url_for('admin_messages'))
 
 if __name__ == '__main__':
     app.run(debug=True)

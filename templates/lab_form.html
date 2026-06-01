@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyberShield Academy — {{ 'Edit Lab' if lab else 'New Lab' }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:          #03060f;
+      --bg2:         #060d1a;
+      --bg3:         #0a1628;
+      --panel:       rgba(10,22,44,0.85);
+      --border:      rgba(0,212,255,0.15);
+      --border-hot:  rgba(0,212,255,0.5);
+      --cyan:        #00d4ff;
+      --cyan-dim:    rgba(0,212,255,0.1);
+      --green:       #00ff88;
+      --green-dim:   rgba(0,255,136,0.1);
+      --red:         #ff3860;
+      --red-dim:     rgba(255,56,96,0.1);
+      --yellow:      #ffd600;
+      --text:        #c8d8f0;
+      --text-dim:    #5a7a9a;
+      --text-bright: #e8f4ff;
+      --mono:        'Share Tech Mono', monospace;
+      --sans:        'Exo 2', sans-serif;
+      --display:     'Rajdhani', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+    .layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px; flex-shrink: 0; background: var(--bg2);
+      border-right: 1px solid var(--border); display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow: hidden;
+    }
+    .sidebar::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
+    .logo-mark { font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; }
+    .logo-mark span { color: var(--green); }
+    .logo-sub  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 3px; margin-top: 4px; }
+    .admin-badge {
+      margin: 12px 20px 16px; padding: 6px 12px;
+      background: var(--red-dim); border: 1px solid rgba(255,56,96,0.35);
+      border-radius: 4px; font-family: var(--mono); font-size: 10px;
+      color: var(--red); letter-spacing: 2px; text-align: center;
+    }
+    .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+    .nav-section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; padding: 0 20px 8px; margin-top: 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      font-family: var(--display); font-size: 13px; font-weight: 500;
+      color: var(--text-dim); text-decoration: none; cursor: pointer;
+      transition: all 0.2s; border-left: 2px solid transparent;
+    }
+    .nav-item:hover { color: var(--text-bright); background: var(--cyan-dim); border-left-color: var(--cyan); }
+    .nav-item.active { color: var(--cyan); background: var(--cyan-dim); border-left-color: var(--cyan); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 9px 14px; background: var(--red-dim); border: 1px solid rgba(255,56,96,0.3);
+      border-radius: 4px; color: var(--red); font-family: var(--display); font-size: 13px;
+      font-weight: 600; letter-spacing: 1px; cursor: pointer; text-decoration: none;
+      text-transform: uppercase; transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,56,96,0.2); border-color: var(--red); }
+
+    /* MAIN */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* TOPBAR */
+    .topbar {
+      height: 60px; background: var(--bg2); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .page-title { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: 2px; color: var(--text-bright); text-transform: uppercase; }
+    .page-breadcrumb { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px; padding: 5px 12px;
+      background: var(--red-dim); border: 1px solid rgba(255,56,96,0.3);
+      border-radius: 20px; font-family: var(--mono); font-size: 10px; color: var(--red); letter-spacing: 1px;
+    }
+    .status-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse-red 2s infinite; }
+    @keyframes pulse-red { 0%,100%{opacity:1}50%{opacity:0.5} }
+    .clock { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 1px; }
+
+    /* CONTENT */
+    .content { flex: 1; padding: 32px; max-width: 860px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px;
+      font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-decoration: none;
+      letter-spacing: 1px; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--cyan); }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden; position: relative;
+    }
+    .form-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+    }
+    .form-header {
+      padding: 24px 28px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .form-header-icon {
+      width: 44px; height: 44px; border-radius: 6px;
+      background: var(--green-dim); border: 1px solid rgba(0,255,136,0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .form-header-title { font-family: var(--display); font-size: 20px; font-weight: 700; letter-spacing: 2px; color: var(--text-bright); text-transform: uppercase; }
+    .form-header-sub { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+
+    .form-body { padding: 28px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+    label .required { color: var(--red); margin-left: 3px; }
+
+    input[type="text"], input[type="number"], input[type="url"], select, textarea {
+      width: 100%; padding: 11px 14px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 4px; color: var(--text-bright);
+      font-family: var(--sans); font-size: 13px;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+      appearance: none; -webkit-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,212,255,0.1);
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a7a9a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+    }
+    select option { background: var(--bg3); color: var(--text-bright); }
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+    .field-hint { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.5px; margin-top: 2px; }
+
+    .form-section-label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--cyan);
+      text-transform: uppercase; margin-bottom: 16px; margin-top: 4px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .form-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .form-actions {
+      padding: 20px 28px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+    }
+    .btn {
+      padding: 10px 24px; border-radius: 4px; font-family: var(--display);
+      font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; border: 1px solid; transition: all 0.2s; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-ghost { background: transparent; color: var(--text-dim); border-color: var(--border); }
+    .btn-ghost:hover { color: var(--text-bright); border-color: var(--border-hot); }
+    .btn-primary { background: var(--cyan-dim); color: var(--cyan); border-color: rgba(0,212,255,0.4); }
+    .btn-primary:hover { background: rgba(0,212,255,0.2); border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,212,255,0.2); }
+    .btn-danger { background: var(--red-dim); color: var(--red); border-color: rgba(255,56,96,0.4); }
+    .btn-danger:hover { background: rgba(255,56,96,0.2); border-color: var(--red); }
+
+    /* Icon picker row */
+    .icon-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .icon-opt {
+      width: 38px; height: 38px; border-radius: 6px; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg3); border: 1px solid var(--border);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .icon-opt:hover, .icon-opt.selected { border-color: var(--cyan); background: var(--cyan-dim); }
+    .icon-input-hidden { display: none; }
+
+    /* FLASH */
+    .flash-container { position: fixed; top: 70px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .flash { padding: 12px 20px; border-radius: 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; animation: flashIn 0.3s ease; max-width: 320px; }
+    .flash-success { background: var(--green-dim); border: 1px solid rgba(0,255,136,0.4); color: var(--green); }
+    .flash-error   { background: var(--red-dim);   border: 1px solid rgba(255,56,96,0.4);  color: var(--red); }
+    @keyframes flashIn { from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)} }
+
+    @media(max-width:860px){
+      .sidebar{width:60px}
+      .sidebar .logo-mark,.sidebar .logo-sub,.sidebar .admin-badge,
+      .sidebar .nav-item span:not(.nav-icon),.sidebar .nav-badge,
+      .sidebar .nav-section-label,.sidebar .logout-btn span:last-child{display:none}
+      .sidebar .nav-item{justify-content:center;padding:12px}
+      .sidebar .sidebar-logo{padding:16px 10px}
+      .sidebar .sidebar-footer{padding:12px}
+      .sidebar .logout-btn{padding:9px;justify-content:center}
+      .main{margin-left:60px}
+    }
+    @media(max-width:600px){
+      .content{padding:16px}
+      .form-grid{grid-template-columns:1fr}
+      .form-group.full{grid-column:1}
+    }
+  </style>
+</head>
+<body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-container">
+  {% for category, message in messages %}
+  <div class="flash flash-{{ category }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="layout">
+
+ <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">Cyber<span>Shield</span></div>
+      <div class="logo-sub">Academy v2.0</div>
+    </div>
+    <div class="admin-badge">⚡ ADMIN ACCESS</div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{{ url_for('admin_dashboard') }}" class="nav-item active">
+        <span class="nav-icon">⬡</span>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section-label">Manage</div>
+      <a href="{{ url_for('admin_messages') }}" class="nav-item">
+        <span class="nav-icon">✉</span>
+        <span>Messages</span>
+        {% if unread_count %}<span class="nav-badge">{{ unread_count }}</span>{% endif %}
+      </a>
+      <a href="//admin/students" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Students</span>
+      </a>
+      <a href="{{ url_for('admin_create_course') }}" class="nav-item">
+        <span class="nav-icon">📚</span>
+        <span>Courses</span>
+      </a>
+      <a href="{{ url_for('admin_create_lab') }}" class="nav-item">
+        <span class="nav-icon">🧪</span>
+        <span>Labs</span>
+      </a>
+      <a href="{{ url_for('admin_create_event') }}" class="nav-item">
+        <span class="nav-icon">⚡</span>
+        <span>Live Events</span>
+      </a>
+
+      <div class="nav-section-label">System</div>
+      
+      
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-btn">
+        <span class="nav-icon">🔒</span>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-title">{{ 'Edit Lab' if lab else 'New Lab' }}</div>
+        <div class="page-breadcrumb">ADMIN / LABS / {{ 'EDIT' if lab else 'CREATE' }}</div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><span class="status-dot"></span>ADMIN SESSION</div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <a href="{{ url_for('admin_dashboard') }}" class="back-link">← BACK TO DASHBOARD</a>
+
+      <div class="form-card">
+        <div class="form-header">
+          <div class="form-header-icon">🧪</div>
+          <div>
+            <div class="form-header-title">{{ 'Edit Lab' if lab else 'Create Lab' }}</div>
+            <div class="form-header-sub">{{ 'Update existing lab configuration' if lab else 'Deploy a new hands-on lab environment to the academy' }}</div>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('admin_edit_lab', lab_id=lab.id) if lab else url_for('admin_create_lab') }}">
+          <div class="form-body">
+
+            <div class="form-section-label">Core Info</div>
+            <div class="form-grid">
+
+              <div class="form-group full">
+                <label>Lab Title <span class="required">*</span></label>
+                <input type="text" name="title" placeholder="e.g. SQL Injection Attack Chain" value="{{ lab.title if lab else '' }}" required/>
+              </div>
+
+              <div class="form-group full">
+                <label>Description <span class="required">*</span></label>
+                <textarea name="description" placeholder="Describe the lab scenario and what operators will practise…" required>{{ lab.description if lab else '' }}</textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Category <span class="required">*</span></label>
+                <select name="category" required>
+                  <option value="" disabled {{ 'selected' if not lab }}>— Select category —</option>
+                  {% set cats = ['web', 'network', 'forensics', 'crypto', 'malware', 'cloud', 'osint', 'reversing', 'exploit', 'social'] %}
+                  {% for c in cats %}
+                    <option value="{{ c }}" {{ 'selected' if lab and lab.category == c }}>{{ c | capitalize }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Difficulty <span class="required">*</span></label>
+                <select name="difficulty" required>
+                  {% for d in ['novice', 'intermediate', 'advanced', 'elite'] %}
+                    <option value="{{ d }}" {{ 'selected' if lab and lab.difficulty == d }}>{{ d | capitalize }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+            </div>
+
+            <br>
+            <div class="form-section-label">Reward &amp; Timing</div>
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label>XP Reward <span class="required">*</span></label>
+                <input type="number" name="xp" min="0" step="50" placeholder="e.g. 500" value="{{ lab.xp if lab else 500 }}" required/>
+                <span class="field-hint">XP awarded on completion</span>
+              </div>
+
+              <div class="form-group">
+                <label>Estimated Duration (mins)</label>
+                <input type="number" name="duration" min="5" step="5" placeholder="e.g. 60" value="{{ lab.duration if lab else 60 }}"/>
+              </div>
+
+              <div class="form-group full">
+                <label>Environment URL</label>
+                <input type="url" name="env_url" placeholder="https://lab.yourdomain.com/env/xyz" value="{{ lab.env_url if lab and lab.env_url else '' }}"/>
+                <span class="field-hint">External URL operators are redirected to on launch — leave blank to stay in-app</span>
+              </div>
+
+            </div>
+
+            <br>
+            <div class="form-section-label">Display</div>
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label>Tags</label>
+                <input type="text" name="tags" placeholder="e.g. xss, owasp, beginner-friendly" value="{{ lab.tags | join(', ') if lab and lab.tags else '' }}"/>
+                <span class="field-hint">Comma-separated keywords</span>
+              </div>
+
+              <div class="form-group">
+                <label>Lab Icon</label>
+                <input type="text" name="icon" id="iconInput" placeholder="⚙" value="{{ lab.icon if lab else '⚙' }}" style="font-size:18px;"/>
+                <span class="field-hint">Paste any emoji — or pick below</span>
+                <div class="icon-picker" id="iconPicker">
+                  {% for ico in ['⚙','🔐','🌐','🕵️','🛡️','💣','🧬','🔍','📡','🖥️','⚡','🗂️','🔧','🧩','🚨'] %}
+                  <div class="icon-opt" data-icon="{{ ico }}" onclick="pickIcon('{{ ico }}')">{{ ico }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+
+            </div>
+
+          </div><!-- /form-body -->
+
+          <div class="form-actions">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-ghost">Cancel</a>
+            {% if lab %}
+              <form method="POST" action="{{ url_for('admin_delete_lab', lab_id=lab.id) }}" style="display:inline" onsubmit="return confirm('Deactivate this lab?')">
+                <button type="submit" class="btn btn-danger">🗑 Deactivate</button>
+              </form>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">
+              {{ '💾 Save Changes' if lab else '🚀 Deploy Lab' }}
+            </button>
+          </div>
+        </form>
+
+      </div><!-- /form-card -->
+    </main>
+  </div>
+</div>
+
+<script>
+  function tick(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('en-GB',{hour12:false});}
+  tick();setInterval(tick,1000);
+
+  function pickIcon(ico){
+    document.getElementById('iconInput').value = ico;
+    document.querySelectorAll('.icon-opt').forEach(el=>{
+      el.classList.toggle('selected', el.dataset.icon === ico);
+    });
+  }
+  // Highlight current icon on load
+  const current = document.getElementById('iconInput').value;
+  if(current){ pickIcon(current); }
+</script>
+</body>
+</html>

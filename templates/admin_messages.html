@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyberShield Academy — Messages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:          #03060f;
+      --bg2:         #060d1a;
+      --bg3:         #0a1628;
+      --panel:       rgba(10,22,44,0.85);
+      --border:      rgba(0,212,255,0.15);
+      --border-hot:  rgba(0,212,255,0.5);
+      --cyan:        #00d4ff;
+      --cyan-dim:    rgba(0,212,255,0.1);
+      --green:       #00ff88;
+      --green-dim:   rgba(0,255,136,0.1);
+      --red:         #ff3860;
+      --red-dim:     rgba(255,56,96,0.1);
+      --yellow:      #ffd600;
+      --yellow-dim:  rgba(255,214,0,0.1);
+      --text:        #c8d8f0;
+      --text-dim:    #5a7a9a;
+      --text-bright: #e8f4ff;
+      --mono:        'Share Tech Mono', monospace;
+      --sans:        'Exo 2', sans-serif;
+      --display:     'Rajdhani', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+    .layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px; flex-shrink: 0; background: var(--bg2);
+      border-right: 1px solid var(--border); display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; overflow: hidden;
+    }
+    .sidebar::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+    .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
+    .logo-mark { font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; }
+    .logo-mark span { color: var(--green); }
+    .logo-sub  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 3px; margin-top: 4px; }
+    .admin-badge {
+      margin: 12px 20px 16px; padding: 6px 12px;
+      background: var(--red-dim); border: 1px solid rgba(255,56,96,0.35);
+      border-radius: 4px; font-family: var(--mono); font-size: 10px;
+      color: var(--red); letter-spacing: 2px; text-align: center;
+    }
+    .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+    .nav-section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; padding: 0 20px 8px; margin-top: 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 20px;
+      font-family: var(--display); font-size: 13px; font-weight: 500;
+      color: var(--text-dim); text-decoration: none; cursor: pointer;
+      transition: all 0.2s; border-left: 2px solid transparent;
+    }
+    .nav-item:hover { color: var(--text-bright); background: var(--cyan-dim); border-left-color: var(--cyan); }
+    .nav-item.active { color: var(--cyan); background: var(--cyan-dim); border-left-color: var(--cyan); }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      padding: 9px 14px; background: var(--red-dim); border: 1px solid rgba(255,56,96,0.3);
+      border-radius: 4px; color: var(--red); font-family: var(--display); font-size: 13px;
+      font-weight: 600; letter-spacing: 1px; cursor: pointer; text-decoration: none;
+      text-transform: uppercase; transition: all 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,56,96,0.2); border-color: var(--red); }
+
+    /* MAIN */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* TOPBAR */
+    .topbar {
+      height: 60px; background: var(--bg2); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .page-title { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: 2px; color: var(--text-bright); text-transform: uppercase; }
+    .page-breadcrumb { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px; padding: 5px 12px;
+      background: var(--red-dim); border: 1px solid rgba(255,56,96,0.3);
+      border-radius: 20px; font-family: var(--mono); font-size: 10px; color: var(--red); letter-spacing: 1px;
+    }
+    .status-dot { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse-red 2s infinite; }
+    @keyframes pulse-red { 0%,100%{opacity:1}50%{opacity:0.5} }
+    .clock { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 1px; }
+
+    /* CONTENT */
+    .content { flex: 1; padding: 32px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 24px;
+      font-family: var(--mono); font-size: 11px; color: var(--text-dim); text-decoration: none;
+      letter-spacing: 1px; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--cyan); }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+      padding: 20px; position: relative; overflow: hidden; transition: border-color 0.2s;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+    .stat-card.cyan::before   { background: var(--cyan); }
+    .stat-card.green::before  { background: var(--green); }
+    .stat-card.red::before    { background: var(--red); }
+    .stat-card.yellow::before { background: var(--yellow); }
+    .stat-card:hover { border-color: var(--border-hot); }
+    .stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; }
+    .stat-value { font-family: var(--display); font-size: 36px; font-weight: 700; line-height: 1; }
+    .stat-card.cyan   .stat-value { color: var(--cyan); }
+    .stat-card.green  .stat-value { color: var(--green); }
+    .stat-card.red    .stat-value { color: var(--red); }
+    .stat-card.yellow .stat-value { color: var(--yellow); }
+    .stat-sub  { font-family: var(--mono); font-size: 10px; color: var(--text-dim); margin-top: 6px; }
+    .stat-icon { position: absolute; bottom: 14px; right: 16px; font-size: 28px; opacity: 0.1; }
+
+    /* TOOLBAR */
+    .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .search-wrap { position: relative; flex: 1; min-width: 220px; }
+    .search-wrap input {
+      width: 100%; padding: 10px 14px 10px 38px;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text-bright); font-family: var(--mono); font-size: 11px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: var(--cyan); }
+    .search-wrap input::placeholder { color: var(--text-dim); }
+    .search-wrap::before {
+      content: '🔍'; position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); font-size: 13px; pointer-events: none;
+    }
+    .filter-select {
+      padding: 10px 36px 10px 14px;
+      background: var(--panel); border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text-bright); font-family: var(--mono); font-size: 11px; outline: none;
+      appearance: none; cursor: pointer; transition: border-color 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a7a9a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    .filter-select:focus { border-color: var(--cyan); }
+    .filter-select option { background: var(--bg3); }
+    .result-count { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; white-space: nowrap; }
+    .result-count span { color: var(--cyan); }
+
+    /* TWO-PANE LAYOUT */
+    .inbox-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
+
+    /* MESSAGE LIST */
+    .msg-list-panel {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden; position: sticky; top: 80px;
+    }
+    .msg-list-header {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      font-family: var(--display); font-size: 13px; font-weight: 700;
+      letter-spacing: 2px; color: var(--text-bright); text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .msg-list-header::before { content: ''; display: inline-block; width: 3px; height: 13px; background: var(--cyan); border-radius: 2px; }
+    .msg-list { max-height: calc(100vh - 220px); overflow-y: auto; }
+    .msg-list::-webkit-scrollbar { width: 4px; }
+    .msg-list::-webkit-scrollbar-track { background: transparent; }
+    .msg-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .msg-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.15s; position: relative;
+    }
+    .msg-row:last-child { border-bottom: none; }
+    .msg-row:hover { background: var(--cyan-dim); }
+    .msg-row.active { background: var(--cyan-dim); border-left: 2px solid var(--cyan); padding-left: 16px; }
+    .msg-row.unread .msg-sender-name { color: var(--text-bright); }
+
+    .unread-dot {
+      width: 7px; height: 7px; background: var(--cyan); border-radius: 50%;
+      margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 6px var(--cyan);
+    }
+    .read-dot {
+      width: 7px; height: 7px; background: transparent; border-radius: 50%;
+      margin-top: 5px; flex-shrink: 0; border: 1px solid var(--text-dim);
+    }
+
+    .msg-row-body { flex: 1; min-width: 0; }
+    .msg-row-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
+    .msg-sender-name { font-family: var(--display); font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .msg-time { font-family: var(--mono); font-size: 9px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+    .msg-subject-line { font-family: var(--mono); font-size: 10px; color: var(--cyan); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.3px; }
+    .msg-preview-text { font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* DETAIL PANEL */
+    .msg-detail-panel {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden;
+    }
+
+    /* Placeholder when nothing is selected */
+    .detail-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 400px; gap: 14px;
+    }
+    .detail-placeholder-icon { font-size: 52px; opacity: 0.15; }
+    .detail-placeholder-text { font-family: var(--mono); font-size: 11px; color: var(--text-dim); letter-spacing: 2px; }
+
+    /* Actual detail */
+    .detail-view { display: none; }
+    .detail-view.visible { display: block; }
+
+    .detail-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    }
+    .detail-sender-block { display: flex; align-items: center; gap: 14px; }
+    .detail-avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: var(--cyan-dim); border: 1px solid var(--border-hot);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display); font-size: 18px; font-weight: 700; color: var(--cyan); flex-shrink: 0;
+    }
+    .detail-sender-name { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--text-bright); letter-spacing: 1px; }
+    .detail-sender-email { font-family: var(--mono); font-size: 10px; color: var(--cyan); margin-top: 3px; }
+    .detail-meta { font-family: var(--mono); font-size: 9px; color: var(--text-dim); margin-top: 4px; letter-spacing: 1px; }
+
+    .detail-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .detail-btn {
+      padding: 7px 14px; border-radius: 3px; font-family: var(--mono); font-size: 10px;
+      cursor: pointer; border: 1px solid; transition: all 0.15s; text-transform: uppercase;
+      letter-spacing: 1px; background: transparent; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-reply  { color: var(--cyan);  border-color: rgba(0,212,255,0.4); }
+    .btn-reply:hover  { background: var(--cyan-dim); }
+    .btn-delete { color: var(--red);   border-color: rgba(255,56,96,0.4); }
+    .btn-delete:hover { background: var(--red-dim); }
+
+    .detail-subject {
+      padding: 14px 24px; border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+    .subject-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+    .subject-value { font-family: var(--display); font-size: 16px; font-weight: 600; color: var(--text-bright); letter-spacing: 1px; }
+
+    .detail-body {
+      padding: 28px 24px;
+      font-size: 14px; line-height: 1.8; color: var(--text);
+      min-height: 220px; white-space: pre-wrap; word-break: break-word;
+    }
+
+    .detail-footer {
+      padding: 16px 24px; border-top: 1px solid var(--border);
+      background: var(--bg3); display: flex; align-items: center; gap: 10px;
+    }
+    .footer-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+    .badge {
+      display: inline-block; padding: 3px 8px; border-radius: 3px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .badge-read   { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,136,0.25); }
+    .badge-unread { background: var(--cyan-dim);  color: var(--cyan);  border: 1px solid rgba(0,212,255,0.25); }
+
+    /* EMPTY STATE */
+    .empty-state { padding: 60px 24px; text-align: center; }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+    .empty-text { font-family: var(--mono); font-size: 12px; color: var(--text-dim); letter-spacing: 1px; }
+
+    /* FLASH */
+    .flash-container { position: fixed; top: 70px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .flash { padding: 12px 20px; border-radius: 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; animation: flashIn 0.3s ease; max-width: 320px; }
+    .flash-success { background: var(--green-dim); border: 1px solid rgba(0,255,136,0.4); color: var(--green); }
+    .flash-error   { background: var(--red-dim);   border: 1px solid rgba(255,56,96,0.4);  color: var(--red); }
+    @keyframes flashIn { from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)} }
+
+    @media(max-width:1100px) {
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .inbox-layout { grid-template-columns: 1fr; }
+      .msg-list-panel { position: static; }
+      .msg-list { max-height: 340px; }
+    }
+    @media(max-width:860px){
+      .sidebar{width:60px}
+      .sidebar .logo-mark,.sidebar .logo-sub,.sidebar .admin-badge,
+      .sidebar .nav-item span:not(.nav-icon),.sidebar .nav-badge,
+      .sidebar .nav-section-label,.sidebar .logout-btn span:last-child{display:none}
+      .sidebar .nav-item{justify-content:center;padding:12px}
+      .sidebar .sidebar-logo{padding:16px 10px}
+      .sidebar .sidebar-footer{padding:12px}
+      .sidebar .logout-btn{padding:9px;justify-content:center}
+      .main{margin-left:60px}
+    }
+    @media(max-width:600px){
+      .content{padding:16px}
+      .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
+      .detail-header{flex-direction:column}
+      .detail-actions{width:100%}
+    }
+  </style>
+</head>
+<body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-container">
+  {% for category, message in messages %}
+  <div class="flash flash-{{ category }}">{{ message }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">Cyber<span>Shield</span></div>
+      <div class="logo-sub">Academy v2.0</div>
+    </div>
+    <div class="admin-badge">⚡ ADMIN ACCESS</div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{{ url_for('admin_dashboard') }}" class="nav-item active">
+        <span class="nav-icon">⬡</span>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section-label">Manage</div>
+      <a href="{{ url_for('admin_messages') }}" class="nav-item">
+        <span class="nav-icon">✉</span>
+        <span>Messages</span>
+        {% if unread_count %}<span class="nav-badge">{{ unread_count }}</span>{% endif %}
+      </a>
+      <a href="//admin/students" class="nav-item">
+        <span class="nav-icon">👥</span>
+        <span>Students</span>
+      </a>
+      <a href="{{ url_for('admin_create_course') }}" class="nav-item">
+        <span class="nav-icon">📚</span>
+        <span>Courses</span>
+      </a>
+      <a href="{{ url_for('admin_create_lab') }}" class="nav-item">
+        <span class="nav-icon">🧪</span>
+        <span>Labs</span>
+      </a>
+      <a href="{{ url_for('admin_create_event') }}" class="nav-item">
+        <span class="nav-icon">⚡</span>
+        <span>Live Events</span>
+      </a>
+
+      <div class="nav-section-label">System</div>
+      
+      
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/logout" class="logout-btn">
+        <span class="nav-icon">🔒</span>
+        <span>Logout</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="page-title">Inbox</div>
+        <div class="page-breadcrumb">ADMIN / MESSAGES / ALL</div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><span class="status-dot"></span>ADMIN SESSION</div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <a href="{{ url_for('admin_dashboard') }}" class="back-link">← BACK TO DASHBOARD</a>
+
+      <!-- Stats -->
+      {% set total_msgs  = messages | length %}
+      {% set unread_msgs = messages | selectattr('is_read', 'equalto', false) | list | length %}
+      {% set read_msgs   = total_msgs - unread_msgs %}
+      <div class="stats-grid">
+        <div class="stat-card cyan">
+          <div class="stat-label">Total Messages</div>
+          <div class="stat-value">{{ total_msgs }}</div>
+          <div class="stat-sub">All time received</div>
+          <div class="stat-icon">✉</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Unread</div>
+          <div class="stat-value">{{ unread_msgs }}</div>
+          <div class="stat-sub">Pending review</div>
+          <div class="stat-icon">🔴</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Read</div>
+          <div class="stat-value">{{ read_msgs }}</div>
+          <div class="stat-sub">Already reviewed</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Latest</div>
+          <div class="stat-value">
+            {% if messages %}
+              {{ messages[0].created_at.strftime('%d %b') }}
+            {% else %}—{% endif %}
+          </div>
+          <div class="stat-sub">Most recent message</div>
+          <div class="stat-icon">📅</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <input type="text" id="searchInput" placeholder="Search by sender, subject, or message…" oninput="filterMessages()"/>
+        </div>
+        <select class="filter-select" id="readFilter" onchange="filterMessages()">
+          <option value="all">All Messages</option>
+          <option value="unread">Unread Only</option>
+          <option value="read">Read Only</option>
+        </select>
+        <div class="result-count">Showing <span id="visibleCount">{{ total_msgs }}</span> of {{ total_msgs }}</div>
+      </div>
+
+      {% if messages %}
+      <!-- Two-pane inbox -->
+      <div class="inbox-layout">
+
+        <!-- LEFT: Message list -->
+        <div class="msg-list-panel">
+          <div class="msg-list-header">Messages</div>
+          <div class="msg-list" id="msgList">
+            {% for msg in messages %}
+            <div class="msg-row {{ 'unread' if not msg.is_read else '' }}"
+                 id="row-{{ msg.id }}"
+                 data-id="{{ msg.id }}"
+                 data-name="{{ msg.full_name }}"
+                 data-subject="{{ msg.subject }}"
+                 data-body="{{ msg.message }}"
+                 data-email="{{ msg.email }}"
+                 data-time="{{ msg.created_at.strftime('%d %b %Y, %H:%M') }}"
+                 data-read="{{ 'true' if msg.is_read else 'false' }}"
+                 data-search="{{ msg.full_name | lower }} {{ msg.subject | lower }} {{ msg.message | lower }}"
+                 onclick="openMessage({{ msg.id }})">
+              <div class="{{ 'read-dot' if msg.is_read else 'unread-dot' }}" id="dot-{{ msg.id }}"></div>
+              <div class="msg-row-body">
+                <div class="msg-row-top">
+                  <span class="msg-sender-name">{{ msg.full_name }}</span>
+                  <span class="msg-time">{{ msg.created_at.strftime('%d %b') }}</span>
+                </div>
+                <div class="msg-subject-line">{{ msg.subject }}</div>
+                <div class="msg-preview-text">{{ msg.message[:80] }}…</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- RIGHT: Detail pane -->
+        <div class="msg-detail-panel" id="detailPanel">
+
+          <!-- Placeholder -->
+          <div class="detail-placeholder" id="detailPlaceholder">
+            <div class="detail-placeholder-icon">✉</div>
+            <div class="detail-placeholder-text">SELECT A MESSAGE TO READ</div>
+          </div>
+
+          <!-- Detail views (one per message, shown on demand) -->
+          {% for msg in messages %}
+          <div class="detail-view" id="detail-{{ msg.id }}">
+
+            <div class="detail-header">
+              <div class="detail-sender-block">
+                <div class="detail-avatar">{{ msg.full_name[0] | upper }}</div>
+                <div>
+                  <div class="detail-sender-name">{{ msg.full_name }}</div>
+                  <div class="detail-sender-email">{{ msg.email }}</div>
+                  <div class="detail-meta">Received {{ msg.created_at.strftime('%d %b %Y at %H:%M') }}{% if msg.ip_address %} · IP {{ msg.ip_address }}{% endif %}</div>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <a href="mailto:{{ msg.email }}?subject=Re: {{ msg.subject | urlencode }}" class="detail-btn btn-reply">✉ Reply</a>
+                <form method="POST" action="{{ url_for('admin_delete_message', msg_id=msg.id) }}" style="display:inline"
+                      onsubmit="return confirm('Delete this message permanently?')">
+                  <button type="submit" class="detail-btn btn-delete">🗑 Delete</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="detail-subject">
+              <div class="subject-label">Subject</div>
+              <div class="subject-value">{{ msg.subject }}</div>
+            </div>
+
+            <div class="detail-body">{{ msg.message }}</div>
+
+            <div class="detail-footer">
+              <span class="footer-label">Status</span>
+              <span class="badge {{ 'badge-read' if msg.is_read else 'badge-unread' }}" id="badge-{{ msg.id }}">
+                {{ 'Read' if msg.is_read else 'Unread' }}
+              </span>
+              <span style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--text-dim);">
+                MSG #{{ msg.id }}
+              </span>
+            </div>
+
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
+      {% else %}
+      <div class="msg-list-panel">
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">No messages in the inbox.</div>
+        </div>
+      </div>
+      {% endif %}
+
+    </main>
+  </div>
+</div>
+
+<script>
+  /* ── Clock ── */
+  function tick(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('en-GB',{hour12:false});}
+  tick();setInterval(tick,1000);
+
+  /* ── Open message detail ── */
+  let currentId = null;
+  function openMessage(id){
+    // Hide placeholder
+    document.getElementById('detailPlaceholder').style.display = 'none';
+
+    // Deactivate previous row
+    if(currentId !== null){
+      const prev = document.getElementById('row-'+currentId);
+      if(prev) prev.classList.remove('active');
+    }
+
+    // Hide all detail views
+    document.querySelectorAll('.detail-view').forEach(el => el.classList.remove('visible'));
+
+    // Show selected
+    const detail = document.getElementById('detail-'+id);
+    if(detail) detail.classList.add('visible');
+
+    // Mark row active
+    const row = document.getElementById('row-'+id);
+    if(row){
+      row.classList.add('active');
+      // Flip dot to read
+      const dot = document.getElementById('dot-'+id);
+      if(dot){ dot.className = 'read-dot'; }
+      row.classList.remove('unread');
+    }
+
+    // Update badge
+    const badge = document.getElementById('badge-'+id);
+    if(badge){ badge.textContent = 'Read'; badge.className = 'badge badge-read'; }
+
+    currentId = id;
+  }
+
+  /* ── Search & filter ── */
+  function filterMessages(){
+    const q      = document.getElementById('searchInput').value.toLowerCase();
+    const status = document.getElementById('readFilter').value;
+    const rows   = document.querySelectorAll('#msgList .msg-row');
+    let visible  = 0;
+
+    rows.forEach(row => {
+      const searchStr = row.dataset.search || '';
+      const isRead    = row.dataset.read === 'true';
+      const matchQ    = !q || searchStr.includes(q);
+      const matchS    = status === 'all' ||
+                        (status === 'unread' && !isRead) ||
+                        (status === 'read'   &&  isRead);
+
+      row.style.display = (matchQ && matchS) ? '' : 'none';
+      if(matchQ && matchS) visible++;
+    });
+    document.getElementById('visibleCount').textContent = visible;
+  }
+</script>
+</body>
+</html>

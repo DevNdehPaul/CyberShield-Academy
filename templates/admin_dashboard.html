@@ -37,7 +37,6 @@
       background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
       pointer-events: none; z-index: 9999;
     }
-    
 
     /* LAYOUT */
     .layout { display: flex; min-height: 100vh; position: relative; z-index: 1; }
@@ -58,8 +57,7 @@
     .logo-sub  { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 3px; margin-top: 4px; }
 
     .admin-badge {
-      margin: 0 20px 16px;
-      margin-top: 12px;
+      margin: 12px 20px 16px;
       padding: 6px 12px;
       background: var(--red-dim);
       border: 1px solid rgba(255,56,96,0.35);
@@ -266,7 +264,6 @@
 </head>
 <body>
 
-<!-- Flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <div class="flash-container">
@@ -300,33 +297,31 @@
         <span>Messages</span>
         {% if unread_count %}<span class="nav-badge">{{ unread_count }}</span>{% endif %}
       </a>
-      <a href="#" class="nav-item">
+      <a href="//admin/students" class="nav-item">
         <span class="nav-icon">👥</span>
         <span>Students</span>
       </a>
-      <a href="#" class="nav-item">
+      <a href="{{ url_for('admin_create_course') }}" class="nav-item">
         <span class="nav-icon">📚</span>
         <span>Courses</span>
       </a>
-      <a href="#" class="nav-item">
-        <span class="nav-icon">🏅</span>
-        <span>Certificates</span>
+      <a href="{{ url_for('admin_create_lab') }}" class="nav-item">
+        <span class="nav-icon">🧪</span>
+        <span>Labs</span>
+      </a>
+      <a href="{{ url_for('admin_create_event') }}" class="nav-item">
+        <span class="nav-icon">⚡</span>
+        <span>Live Events</span>
       </a>
 
       <div class="nav-section-label">System</div>
-      <a href="#" class="nav-item">
-        <span class="nav-icon">📊</span>
-        <span>Analytics</span>
-      </a>
-      <a href="#" class="nav-item">
-        <span class="nav-icon">⚙</span>
-        <span>Settings</span>
-      </a>
+      
+      
     </nav>
 
     <div class="sidebar-footer">
       <a href="/logout" class="logout-btn">
-       <span class="nav-icon">🔒</span>
+        <span class="nav-icon">🔒</span>
         <span>Logout</span>
       </a>
     </div>
@@ -364,7 +359,7 @@
         </div>
         <div class="stat-card yellow">
           <div class="stat-label">Total Enrollments</div>
-          <div class="stat-value">{{ total_enrollments }}</div>
+          <div class="stat-value">{{ total_enrollments if total_enrollments is defined else 0 }}</div>
           <div class="stat-sub">Across all courses</div>
           <div class="stat-icon">📚</div>
         </div>
@@ -383,7 +378,7 @@
         <div>
           <div class="section-header">
             <div class="section-title">Student Accounts</div>
-            <a href="#" class="section-link">VIEW ALL →</a>
+            <a href="/admin/students" class="section-link">VIEW ALL →</a>
           </div>
           <div class="table-wrap">
             <table>
@@ -397,8 +392,7 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- Jinja2: Loop through users passed from Flask view -->
-             {% for user in users %}
+                {% for user in users %}
                 <tr>
                   <td>
                     <div class="user-cell">
@@ -434,39 +428,7 @@
           </div>
         </div>
 
-        <!-- Quick actions -->
-        <div>
-          <div class="section-header">
-            <div class="section-title">Quick Actions</div>
-          </div>
-          <div class="quick-actions">
-            <a href="{{ url_for('admin_messages') }}" class="quick-btn">
-              <span class="quick-btn-icon">✉</span>
-              <span class="quick-btn-label">View Messages</span>
-              <span class="quick-btn-arrow">›</span>
-            </a>
-            <a href="#" class="quick-btn">
-              <span class="quick-btn-icon">➕</span>
-              <span class="quick-btn-label">Add New Course</span>
-              <span class="quick-btn-arrow">›</span>
-            </a>
-            <a href="#" class="quick-btn">
-              <span class="quick-btn-icon">📊</span>
-              <span class="quick-btn-label">Enrollment Report</span>
-              <span class="quick-btn-arrow">›</span>
-            </a>
-            <a href="#" class="quick-btn">
-              <span class="quick-btn-icon">🔒</span>
-              <span class="quick-btn-label">Security Logs</span>
-              <span class="quick-btn-arrow">›</span>
-            </a>
-            <a href="#" class="quick-btn">
-              <span class="quick-btn-icon">💾</span>
-              <span class="quick-btn-label">Export User Data</span>
-              <span class="quick-btn-arrow">›</span>
-            </a>
-          </div>
-        </div>
+        
       </div>
 
       <!-- Recent messages -->
@@ -475,7 +437,6 @@
         <a href="{{ url_for('admin_messages') }}" class="section-link">VIEW ALL →</a>
       </div>
       <div class="messages-panel">
-        <!-- Jinja2:-->
         {% for msg in recent_messages %}
         <div class="msg-item">
           <div class="{{ 'msg-unread-dot' if not msg.is_read else 'msg-read-dot' }}"></div>
@@ -489,7 +450,6 @@
           </div>
         </div>
         {% endfor %}
-        
       </div>
 
     </main>
