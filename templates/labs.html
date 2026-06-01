@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block title %}
+CyberShield Academy
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/labs.css') }}"><br><br><br><br><br>
+
+<div class="labs-page">
+  <div class="container">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+              {% if category == 'success' %}✓{% elif category == 'error' %}✗{% else %}ℹ{% endif %}
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Cyber <span>Labs</span></h1>
+        <p>Deploy. Exploit. Learn. Real environments, real techniques.</p>
+      </div>
+      <div class="page-header-right">
+        <div class="search-box">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="labSearch" placeholder="Search labs..." autocomplete="off">
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Event Hero -->
+    {% if live_event %}
+    <div class="hero-section">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="live-badge">
+            <span class="live-dot"></span>
+            Live Event
+          </div>
+          <h2 class="hero-title">{{ live_event.title }}</h2>
+          <p class="hero-desc">{{ live_event.description }}</p>
+          <div class="hero-meta">
+            <div class="meta-item">
+              <label>Time Remaining</label>
+              <div class="timer" id="heroTimer" data-ends="{{ live_event.ends_at }}">
+                {{ live_event.ends_at }}
+              </div>
+            </div>
+            <div class="meta-item">
+              <label>XP Prize Pool</label>
+              <div class="xp-pool">{{ "{:,}".format(live_event.xp_pool) }} XP</div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            {% if current_user.is_authenticated %}
+              <a href="{{ url_for('labs.join_event', event_id=live_event.id) }}" class="btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 3l14 9-14 9V3z"/>
+                </svg>
+                Join Now
+              </a>
+            {% else %}
+              <a href="{{ url_for('auth.login') }}" class="btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 3l14 9-14 9V3z"/>
+                </svg>
+                Join Now
+              </a>
+            {% endif %}
+            <a href="{{ url_for('labs.event_briefing', event_id=live_event.id) }}" class="btn-secondary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/>
+              </svg>
+              View Briefing
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="terminal-window">
+            <div class="terminal-bar">
+              <span class="terminal-dot td-r"></span>
+              <span class="terminal-dot td-y"></span>
+              <span class="terminal-dot td-g"></span>
+              <span class="terminal-title">kernel_exploit.sh — bash</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="t-dim">root@cyberlab:~# </span><span class="t-cyan">./pivot_network.sh</span></div>
+              <div><span class="t-dim">[*] Scanning subnet 10.0.0.0/24...</span></div>
+              <div><span class="t-green">[+] Found 3 live hosts</span></div>
+              <div><span class="t-dim">[*] Attempting privilege escalation...</span></div>
+              <div><span class="t-orange">[!] CVE-2024-1086 detected</span></div>
+              <div><span class="t-green">[+] Root shell acquired</span></div>
+              <div><span class="t-dim">[*] Extracting kernel logs...</span></div>
+              <div><span class="t-cyan">root@target:~# </span><span class="t-white">cat /var/log/kern.log.enc<span class="blink">_</span></span></div>
+            </div>
+            <div class="scan-bar">
+              <span class="scan-text">Scanning...</span>
+              <div class="scan-progress-track">
+                <div class="scan-progress-fill"></div>
+              </div>
+              <span class="scan-pct">92% Secure</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card" style="--stat-color: var(--accent-cyan); --stat-glow: var(--accent-cyan-glow);">
+        <div class="stat-label">Total Labs</div>
+        <div class="stat-value">{{ stats.total_labs }}</div>
+        <div class="stat-sub">Available now</div>
+        <div class="stat-icon">⚙</div>
+      </div>
+      <div class="stat-card" style="--stat-color: var(--accent-green); --stat-glow: rgba(0,255,136,0.4);">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value">{{ stats.completed }}</div>
+        <div class="stat-sub">Your score</div>
+        <div class="stat-icon">✓</div>
+      </div>
+      <div class="stat-card" style="--stat-color: var(--accent-orange); --stat-glow: rgba(255,157,0,0.4);">
+        <div class="stat-label">In Progress</div>
+        <div class="stat-value">{{ stats.in_progress }}</div>
+        <div class="stat-sub">Keep going</div>
+        <div class="stat-icon">◉</div>
+      </div>
+      <div class="stat-card" style="--stat-color: var(--accent-purple); --stat-glow: rgba(123,47,255,0.4);">
+        <div class="stat-label">XP Earned</div>
+        <div class="stat-value">{{ "{:,}".format(stats.xp_earned) }}</div>
+        <div class="stat-sub">Total points</div>
+        <div class="stat-icon">★</div>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-bar" id="filterBar">
+      <a href="/labs" 
+         class="filter-tab {% if active_filter == 'all' %}active{% endif %}" 
+         data-filter="all">
+        All Operations <span class="count">{{ stats.total_labs }}</span>
+      </a>
+      <a href="/labs?category=penetration-testing" 
+         class="filter-tab {% if active_filter == 'penetration-testing' %}active{% endif %}" 
+         data-filter="penetration-testing">Penetration Testing</a>
+      <a href="/labs?category=cryptography" 
+         class="filter-tab {% if active_filter == 'cryptography' %}active{% endif %}" 
+         data-filter="cryptography">Cryptography</a>
+      <a href="/labs?category=reverse-engineering" 
+         class="filter-tab {% if active_filter == 'reverse-engineering' %}active{% endif %}" 
+         data-filter="reverse-engineering">Reverse Engineering</a>
+      <a href="/labs?category=web-exploitation" 
+         class="filter-tab {% if active_filter == 'web-exploitation' %}active{% endif %}" 
+         data-filter="web-exploitation">Web Exploitation</a>
+      <a href="/labs?category=forensics" 
+         class="filter-tab {% if active_filter == 'forensics' %}active{% endif %}" 
+         data-filter="forensics">Forensics</a>
+    </div>
+
+    <!-- Labs Grid -->
+    <div class="section-header">
+      <span class="section-title">Operations</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="labs-grid" id="labsGrid">
+      {% for lab in labs %}
+      <div class="lab-card" data-title="{{ lab.title | lower }}" data-category="{{ lab.category }}">
+        {% if lab.user_progress and lab.user_progress.completed %}
+        <div class="completed-ribbon">Done</div>
+        {% endif %}
+
+        <div class="lab-card-img">
+          <div class="img-grid"></div>
+          <div class="lab-card-img-bg">{{ lab.icon }}</div>
+          <div class="difficulty-badge diff-{{ lab.difficulty | lower }}">{{ lab.difficulty }}</div>
+        </div>
+
+        <div class="lab-card-body">
+          <div class="lab-card-title">{{ lab.title }}</div>
+          <div class="lab-card-desc">{{ lab.description }}</div>
+
+          <div class="lab-tags">
+            {% for tag in lab.tags %}
+            <span class="lab-tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+
+          <div class="lab-meta">
+            <div class="lab-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span class="xp-val">{{ lab.xp }} XP</span>
+            </div>
+            <div class="lab-meta-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+              </svg>
+              {{ lab.duration }} MIN
+            </div>
+          </div>
+
+          {% if lab.user_progress %}
+          <div class="progress-area">
+            <div class="progress-label">
+              <span>Completion</span>
+              <span class="pct">{{ lab.user_progress.percent }}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill {% if lab.user_progress.percent == 100 %}complete{% endif %}"
+                   style="width: {{ lab.user_progress.percent }}%"></div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="lab-card-footer">
+          {% if lab.user_progress and lab.user_progress.completed %}
+            <a href="{{ url_for('labs.launch', lab_id=lab.id) }}" class="btn-launch btn-launch-green">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 3l14 9-14 9V3z"/>
+              </svg>
+              Launch Again
+            </a>
+          {% elif lab.user_progress and lab.user_progress.percent > 0 %}
+            <a href="{{ url_for('labs.launch', lab_id=lab.id) }}" class="btn-launch btn-launch-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+              </svg>
+              Continue Lab
+            </a>
+          {% else %}
+            <a href="{{ url_for('labs.launch', lab_id=lab.id) }}" class="btn-launch btn-launch-outline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              Deploy Lab
+            </a>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div style="grid-column: 1/-1; text-align:center; padding: 60px 20px; color: var(--text-dim); font-family: var(--font-mono); font-size: 13px;">
+        <div style="font-size:48px; margin-bottom:16px; opacity:0.3;">⚙</div>
+        No labs found for this category. Check back soon.
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination and pagination.pages > 1 %}
+    <div class="pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('labs.index', page=pagination.prev_num, category=active_filter) }}" class="page-btn">‹</a>
+      {% endif %}
+      {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+          <a href="{{ url_for('labs.index', page=p, category=active_filter) }}"
+             class="page-btn {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
+        {% else %}
+          <span class="page-btn" style="cursor:default;">…</span>
+        {% endif %}
+      {% endfor %}
+      {% if pagination.has_next %}
+        <a href="{{ url_for('labs.index', page=pagination.next_num, category=active_filter) }}" class="page-btn">›</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div><!-- /container -->
+</div><!-- /labs-page -->
+
+<script>
+  // Live countdown timer
+  const timerEl = document.getElementById('heroTimer');
+  if (timerEl) {
+    const endsAt = new Date(timerEl.dataset.ends);
+    function updateTimer() {
+      const now = new Date();
+      const diff = endsAt - now;
+      if (diff <= 0) { timerEl.textContent = '00 : 00 : 00 : 00'; return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      timerEl.textContent =
+        String(d).padStart(2,'0') + ' : ' +
+        String(h).padStart(2,'0') + ' : ' +
+        String(m).padStart(2,'0') + ' : ' +
+        String(s).padStart(2,'0');
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000);
+  }
+
+  // Live search filter
+  const searchInput = document.getElementById('labSearch');
+  const cards = document.querySelectorAll('.lab-card');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const q = this.value.toLowerCase().trim();
+      cards.forEach(card => {
+        const title = card.dataset.title || '';
+        card.style.display = (!q || title.includes(q)) ? '' : 'none';
+      });
+    });
+  }
+</script>
+
+{% endblock %}

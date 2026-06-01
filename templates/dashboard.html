@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% block title %}Authentication — CyberShield Academy{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"><br><br><br><br><br><br>
+
+
+<!-- Flash messages (Jinja2 equivalent) -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+
+<div class="layout">
+
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-breadcrumb">HOME / STUDENT / OVERVIEW</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          SECURE SESSION
+        </div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="content">
+
+      <!-- Welcome banner -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2>WELCOME BACK, <span class="user-info-name">
+          {{ user.first_name | upper }} {{ user.last_name | upper  }}
+         
+          </span></h2>
+          <p>// SYSTEM_TIME: <span id="date-display"></span> · THREAT_LEVEL: LOW · ALL SYSTEMS NOMINAL</p>
+        </div>
+        <a href="#" class="welcome-enroll-btn">＋ Enroll Now</a>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card cyan">
+          <div class="stat-label">Enrolled Courses</div>
+          <div class="stat-value">{{ enrollments | length }}</div>
+          
+          <div class="stat-sub">Active tracks</div>
+          <div class="stat-icon">📚</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Avg. Progress</div>
+          <!-- Jinja2: calculate avg progress -->
+          <div class="stat-value">61%</div>
+          <div class="stat-sub">Across all courses</div>
+          <div class="stat-icon">📈</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Modules Done</div>
+          <div class="stat-value">14</div>
+          <div class="stat-sub">Of 28 total</div>
+          <div class="stat-icon">✅</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Certificates</div>
+          <div class="stat-value">1</div>
+          <div class="stat-sub">Earned so far</div>
+          <div class="stat-icon">🏅</div>
+        </div>
+      </div>
+
+      <!-- Courses + Activity -->
+      <div class="two-col">
+
+        <!-- Enrolled courses -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Active Courses</div>
+            <a href="#" class="section-link">VIEW ALL →</a>
+          </div>
+
+          <div class="courses-list">
+            {% if enrollments %}
+              {% for enrollment in enrollments %}
+              <div class="course-card">
+                <div class="course-card-top">
+                  <div class="course-title-text">{{ enrollment.course.title }}</div>
+                  <span class="course-level-badge level-{{ enrollment.course.level | lower }}">
+                    {{ enrollment.course.level }}
+                  </span>
+                </div>
+                <div class="course-meta">
+                  <div class="course-meta-item">⏱ {{ enrollment.course.duration }}</div>
+                  <div class="course-meta-item">📦 {{ enrollment.course.modules }} modules</div>
+                </div>
+                <div class="progress-wrap">
+                  <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width:{{ enrollment.progress }}%"></div>
+                  </div>
+                  <div class="progress-pct">{{ enrollment.progress }}%</div>
+                </div>
+                <a href="#" class="course-continue-btn">▶ Continue</a>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state">
+                <div class="empty-icon">🔒</div>
+                <div class="empty-title">No courses enrolled</div>
+                <div class="empty-sub">Explore the catalogue to begin your training</div>
+              </div>
+            {% endif %}
+
+            <!-- DEMO DATA (remove when using Jinja2 loop above) -->
+            <!-- <div class="course-card">
+              <div class="course-card-top">
+                <div class="course-title-text">Network Penetration Testing</div>
+                <span class="course-level-badge level-advanced">Advanced</span>
+              </div>
+              <div class="course-meta">
+                <div class="course-meta-item">⏱ 12 hrs</div>
+                <div class="course-meta-item">📦 8 modules</div>
+                <div class="course-meta-item">🕐 2 days ago</div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width:75%"></div>
+                </div>
+                <div class="progress-pct">75%</div>
+              </div>
+              <a href="#" class="course-continue-btn">▶ Continue</a>
+            </div> -->
+
+            <div class="course-card">
+              <div class="course-card-top">
+                <div class="course-title-text">Web Application Security</div>
+                <span class="course-level-badge level-intermediate">Intermediate</span>
+              </div>
+              <div class="course-meta">
+                <div class="course-meta-item">⏱ 9 hrs</div>
+                <div class="course-meta-item">📦 6 modules</div>
+                <div class="course-meta-item">🕐 5 days ago</div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width:50%"></div>
+                </div>
+                <div class="progress-pct">50%</div>
+              </div>
+              <a href="#" class="course-continue-btn">▶ Continue</a>
+            </div>
+
+            <div class="course-card">
+              <div class="course-card-top">
+                <div class="course-title-text">Linux Fundamentals for Hackers</div>
+                <span class="course-level-badge level-beginner">Beginner</span>
+              </div>
+              <div class="course-meta">
+                <div class="course-meta-item">⏱ 6 hrs</div>
+                <div class="course-meta-item">📦 5 modules</div>
+                <div class="course-meta-item">🕐 1 week ago</div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" style="width:58%"></div>
+                </div>
+                <div class="progress-pct">58%</div>
+              </div>
+              <a href="#" class="course-continue-btn">▶ Continue</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity feed -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Recent Activity</div>
+          </div>
+
+          <div class="activity-feed">
+            <div class="activity-item">
+              <div class="activity-dot dot-green"></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Module 6 completed</strong> — Network Penetration Testing</div>
+                <div class="activity-time">2 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-cyan"></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Lab exercise submitted</strong> — SQL Injection basics</div>
+                <div class="activity-time">Yesterday, 15:32</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-yellow"></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Quiz passed</strong> — HTTP headers & response codes (88%)</div>
+                <div class="activity-time">3 days ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-cyan"></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Enrolled</strong> — Linux Fundamentals for Hackers</div>
+                <div class="activity-time">1 week ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-green"></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Certificate earned</strong> — Ethical Hacking Foundations</div>
+                <div class="activity-time">2 weeks ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-red"></div>
+              <div class="activity-body">
+                <div class="activity-text"><strong>Password changed</strong> — Account security updated</div>
+                <div class="activity-time">3 weeks ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certification tracks -->
+      <div class="cert-panel">
+        <div class="section-header">
+          <div class="section-title">Certification Tracks</div>
+          <a href="#" class="section-link">VIEW ALL →</a>
+        </div>
+        <div class="cert-grid">
+          <div class="cert-item">
+            <div class="cert-icon-wrap">🔓</div>
+            <div class="cert-name">Ethical Hacking</div>
+            <div class="cert-status earned">✔ EARNED</div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon-wrap">🌐</div>
+            <div class="cert-name">Web AppSec</div>
+            <div class="cert-status active">● IN PROGRESS</div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon-wrap">🛡</div>
+            <div class="cert-name">Network Defense</div>
+            <div class="cert-status active">● IN PROGRESS</div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon-wrap">🔍</div>
+            <div class="cert-name">Digital Forensics</div>
+            <div class="cert-status locked">🔒 LOCKED</div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon-wrap">☁</div>
+            <div class="cert-name">Cloud Security</div>
+            <div class="cert-status locked">🔒 LOCKED</div>
+          </div>
+          <div class="cert-item">
+            <div class="cert-icon-wrap">🤖</div>
+            <div class="cert-name">AI & SecOps</div>
+            <div class="cert-status locked">🔒 LOCKED</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /.main -->
+</div><!-- /.layout -->
+
+<script>
+  // Live clock
+  function tick() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('en-GB', { hour12: false });
+    document.getElementById('date-display').textContent =
+      now.toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // Auto-dismiss flash messages
+  setTimeout(() => {
+    document.querySelectorAll('.flash').forEach(el => {
+      el.style.transition = 'opacity 0.5s';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 500);
+    });
+  }, 4000);
+</script>
+
+{% endblock %}

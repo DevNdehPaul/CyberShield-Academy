@@ -1,373 +1,241 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Courses | CYBER_ACADEMY</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .glass-panel {
-            background: rgba(22, 27, 34, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid #30363D;
-        }
-        .course-card:hover {
-            border-color: #00D1FF;
-            box-shadow: 0 0 12px rgba(0, 209, 255, 0.15);
-        }
-        .neon-glow {
-            box-shadow: 0 0 15px rgba(0, 209, 255, 0.3);
-        }
-        body {
-            background-color: #0f141b;
-            color: #dee2ec;
-        }
-    </style>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "surface-variant": "#30353d",
-                        "secondary-fixed-dim": "#96ccff",
-                        "on-background": "#dee2ec",
-                        "on-tertiary": "#66070c",
-                        "inverse-primary": "#00677f",
-                        "error-container": "#93000a",
-                        "surface-container-highest": "#30353d",
-                        "secondary-container": "#0168a2",
-                        "primary-fixed": "#b7eaff",
-                        "surface-container-low": "#171c23",
-                        "on-surface": "#dee2ec",
-                        "outline": "#859399",
-                        "tertiary-fixed-dim": "#ffb3ad",
-                        "primary-container": "#00d1ff",
-                        "primary": "#a4e6ff",
-                        "secondary": "#96ccff",
-                        "on-secondary-fixed-variant": "#004a76",
-                        "on-secondary-container": "#c9e3ff",
-                        "outline-variant": "#3c494e",
-                        "on-tertiary-container": "#902926",
-                        "inverse-surface": "#dee2ec",
-                        "on-primary": "#003543",
-                        "on-primary-container": "#00566a",
-                        "surface": "#0f141b",
-                        "on-surface-variant": "#bbc9cf",
-                        "on-secondary": "#003353",
-                        "on-error": "#690005",
-                        "background": "#0f141b",
-                        "surface-container-high": "#252a32",
-                        "surface-tint": "#4cd6ff",
-                        "on-secondary-fixed": "#001d32",
-                        "on-primary-fixed-variant": "#004e60",
-                        "surface-container-lowest": "#090f15",
-                        "on-tertiary-fixed-variant": "#86211f",
-                        "surface-dim": "#0f141b",
-                        "on-error-container": "#ffdad6",
-                        "secondary-fixed": "#cee5ff",
-                        "on-primary-fixed": "#001f28",
-                        "tertiary": "#ffd1cd",
-                        "error": "#ffb4ab",
-                        "tertiary-fixed": "#ffdad6",
-                        "on-tertiary-fixed": "#410003",
-                        "surface-container": "#1b2027",
-                        "tertiary-container": "#ffaaa2",
-                        "primary-fixed-dim": "#4cd6ff",
-                        "inverse-on-surface": "#2c3138",
-                        "surface-bright": "#343941"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                    "spacing": {
-                        "gutter": "20px",
-                        "xl": "48px",
-                        "sm": "8px",
-                        "md": "16px",
-                        "lg": "24px",
-                        "container-max": "1280px",
-                        "base": "4px",
-                        "xs": "4px"
-                    },
-                    "fontFamily": {
-                        "headline-md": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "body-sm": ["Inter"],
-                        "code-md": ["JetBrains Mono"],
-                        "body-md": ["Inter"],
-                        "label-caps": ["JetBrains Mono"],
-                        "headline-xl": ["Inter"],
-                        "headline-lg": ["Inter"]
-                    },
-                    "fontSize": {
-                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
-                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
-                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                        "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
-                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
-                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
-                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="selection:bg-primary-container selection:text-on-primary-container">
-<!-- TopAppBar -->
-<header class="bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant docked full-width top-0 sticky z-50">
-<div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
-<div class="text-headline-md font-headline-md font-bold tracking-tighter text-primary dark:text-primary-container">
-                CYBER_ACADEMY
-            </div>
-<nav class="hidden md:flex items-center gap-lg">
-<a class="text-primary dark:text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary-fixed-dim dark:hover:text-primary-fixed transition-colors duration-200 text-label-caps font-label-caps" href="#">Training</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant font-medium hover:text-primary-fixed-dim dark:hover:text-primary-fixed transition-colors duration-200 text-label-caps font-label-caps" href="#">Labs</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant font-medium hover:text-primary-fixed-dim dark:hover:text-primary-fixed transition-colors duration-200 text-label-caps font-label-caps" href="#">Resources</a>
-<a class="text-on-surface-variant dark:text-on-surface-variant font-medium hover:text-primary-fixed-dim dark:hover:text-primary-fixed transition-colors duration-200 text-label-caps font-label-caps" href="#">Certifications</a>
-</nav>
-<div class="flex items-center gap-md">
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
-<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">account_circle</button>
-<button class="bg-primary-container text-on-primary-container px-md py-xs rounded font-label-caps text-label-caps hover:opacity-80 active:scale-95 transition-all">Sign In</button>
-</div>
-</div>
-</header>
-<main class="max-w-container-max mx-auto px-gutter pb-xl">
-<!-- Hero Section -->
-<section class="py-xl flex flex-col items-start gap-md">
-<div class="inline-flex items-center gap-xs text-primary-container bg-primary-container/10 px-sm py-xs border border-primary-container/20 rounded">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="font-label-caps text-label-caps">MISSION DIRECTIVE</span>
-</div>
-<h1 class="font-headline-xl text-headline-xl text-on-surface max-w-2xl leading-tight">
-                Master Your Mission
-            </h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-                Deploy specialized training tracks designed for the modern operative. From perimeter defense to advanced offensive maneuvers, select your path and secure the digital frontier.
-            </p>
-</section>
-<!-- Filter & Search Bar -->
-<section class="mb-lg">
-<div class="glass-panel p-md rounded-xl flex flex-col md:flex-row gap-md items-center">
-<div class="relative flex-grow w-full md:w-auto">
-<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">search</span>
-<input class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface pl-xl pr-md py-md rounded font-code-md text-code-md focus:border-primary-container focus:ring-0 outline-none transition-all" placeholder="Search operational courses..." type="text"/>
-</div>
-<div class="flex gap-sm w-full md:w-auto overflow-x-auto pb-sm md:pb-0">
-<select class="bg-surface-container-lowest border border-outline-variant text-on-surface px-md py-md rounded font-label-caps text-label-caps min-w-[140px] appearance-none cursor-pointer focus:border-primary-container">
-<option>All Levels</option>
-<option>Beginner</option>
-<option>Intermediate</option>
-<option>Advanced</option>
-</select>
-<select class="bg-surface-container-lowest border border-outline-variant text-on-surface px-md py-md rounded font-label-caps text-label-caps min-w-[160px] appearance-none cursor-pointer focus:border-primary-container">
-<option>All Topics</option>
-<option>Ethical Hacking</option>
-<option>Cryptography</option>
-<option>Digital Forensics</option>
-</select>
-</div>
-</div>
-</section>
-<!-- Course Grid -->
-<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-<!-- Card 1 -->
-<div class="course-card glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300">
-<div class="h-48 relative overflow-hidden bg-surface-container-low">
-<img alt="Network Penetration" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="A cinematic, high-contrast shot of a darkened room with multiple server monitors displaying glowing green and blue terminal code. The aesthetic is industrial cyber-tech with shallow depth of field, highlighting a mechanical keyboard in the foreground. The lighting is cool-toned with vibrant neon blue highlights reflecting off metallic surfaces." src="https://lh3.googleusercontent.com/aida/AP1WRLuEuHJ3KskCl59TdDJgQayZJff6c9yZS3Qq7-9GLD_k_lTpQ9q1ElCJEssXOjljrge7PKQ_Tj_OEDdgTruBrUouoZ_mBLooKGkCj2YFSy-8PLAH09b4bbR8lkaAz_xJIdWdRaiLkRIqrtMSyivczFN9QPYIB1mC7n7rrwaQhW6VWO3P33CqyhgFQMOmK5tV7N3oHbJf_GwxDA1WDXcGJhX8irI01XwcqUCMKQf-_bPRUcAqNKiWoz1_hus"/>
-<div class="absolute top-md left-md">
-<span class="bg-error-container text-on-error-container font-label-caps text-[10px] px-sm py-1 rounded-full uppercase tracking-widest border border-error">Advanced</span>
-</div>
-</div>
-<div class="p-lg flex flex-col flex-grow gap-sm">
-<div class="flex justify-between items-center text-primary-fixed">
-<span class="material-symbols-outlined" data-weight="fill">hub</span>
-<span class="font-code-md text-label-caps">12.5 HOURS</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Network Penetration Testing</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                        Exploit vulnerabilities in enterprise-grade infrastructure. Master pivot techniques and post-exploitation persistence in secure environments.
-                    </p>
-<div class="pt-md border-t border-outline-variant mt-auto">
-<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded hover:opacity-90 neon-glow transition-all">ENROLL NOW</button>
-</div>
-</div>
-</div>
-<!-- Card 2 -->
-<div class="course-card glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300">
-<div class="h-48 relative overflow-hidden bg-surface-container-low">
-<img alt="Cryptography" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="Abstract digital visualization of cascading cryptographic strings and mathematical equations forming a 3D shield structure. The style is minimalist and futuristic, utilizing deep obsidian backgrounds with sharp, crystalline light-blue light trails. The mood is highly technical and secure, echoing a digital command center aesthetic." src="https://lh3.googleusercontent.com/aida/AP1WRLs22OTxxgUPNFC1xFItBAzAV5do5U5kxzBKEcKI11xB5PxHQ3eCyU8eF_sLAWrNIlZ8pPY6Qbf9UAsDb2pYksARuKcJF1TNR-Gcj2XfARxH9yntDUnVDFbNP8qaAWswnpXjS_nIe5aBqBClMnZN1qD0nn53qri04Cp38tytTtz24tREPB4ozPTAXgtdg8uaUMBv-dzizp6AY2Hj7Dsg-NYDud3QPEVSdxQ_XKhT9WbM08iKUhzhYN4FqA"/>
-<div class="absolute top-md left-md">
-<span class="bg-secondary-container text-on-secondary-container font-label-caps text-[10px] px-sm py-1 rounded-full uppercase tracking-widest border border-secondary">Intermediate</span>
-</div>
-</div>
-<div class="p-lg flex flex-col flex-grow gap-sm">
-<div class="flex justify-between items-center text-primary-fixed">
-<span class="material-symbols-outlined" data-weight="fill">enhanced_encryption</span>
-<span class="font-code-md text-label-caps">8.0 HOURS</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Advanced Encryption Standards</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                        Deep dive into symmetric and asymmetric protocols. Understand the mathematical foundations of modern secure communication.
-                    </p>
-<div class="pt-md border-t border-outline-variant mt-auto">
-<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded hover:opacity-90 neon-glow transition-all">ENROLL NOW</button>
-</div>
-</div>
-</div>
-<!-- Card 3 -->
-<div class="course-card glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300">
-<div class="h-48 relative overflow-hidden bg-surface-container-low">
-<img alt="Digital Forensics" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="A macro photograph of an illuminated microchip on a motherboard, with glowing electrical pathways in electric blue. The atmosphere is cold and technical, capturing the precision of hardware investigation. Soft bokeh effects frame the sharp technical details, emphasizing a forensic, investigative mood within a high-tech cybersecurity framework." src="https://lh3.googleusercontent.com/aida/AP1WRLsWVMmG1SWKlwHd5sfF2CEha9BcE7Js_q4K8QtQrboICN0_d_qekk6B7dm9QESYo8cmAnzcgSD5kgDtd15l-EhgAERTjguQOs4TigxpQkNO2C-oZbI5oMi6j_rCZJiuBfd7KDKpgnG4SbLcHFgwDNsFhsrSiBpSIMR5RgOnr619CY5MKd7LaHc5pwULSkq7pNXPNzXw0TWIOPfmwXLEmkYZeVWnd_Lxh8-70cR-gEdd69ihXbR6U3aSF4w"/>
-<div class="absolute top-md left-md">
-<span class="bg-surface-variant text-on-surface-variant font-label-caps text-[10px] px-sm py-1 rounded-full uppercase tracking-widest border border-outline">Beginner</span>
-</div>
-</div>
-<div class="p-lg flex flex-col flex-grow gap-sm">
-<div class="flex justify-between items-center text-primary-fixed">
-<span class="material-symbols-outlined" data-weight="fill">terminal</span>
-<span class="font-code-md text-label-caps">6.5 HOURS</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Cyber Incident Response</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                        Learn the fundamental protocols for containment, eradication, and recovery following a major security breach.
-                    </p>
-<div class="pt-md border-t border-outline-variant mt-auto">
-<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded hover:opacity-90 neon-glow transition-all">ENROLL NOW</button>
-</div>
-</div>
-</div>
-<!-- Card 4 -->
-<div class="course-card glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300">
-<div class="h-48 relative overflow-hidden bg-surface-container-low">
-<img alt="Web Security" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="A stylized digital landscape representing global network traffic, featuring interconnected nodes and data streams in vibrant cyan against a deep charcoal background. The perspective is from above, showing a vast, organized grid of light. The visual style is sleek and corporate-tech, emphasizing connectivity and digital infrastructure security." src="https://lh3.googleusercontent.com/aida/AP1WRLuRh76JVEJRTR55wK5RttFOZ-7vTLw66Mous1gA8DD16XtGGRrBMpfi9VIDzlJhxjnoXcOZUJa3gf1jLncSdMm5ZamlicdxAW4dy0aKhYedL-JBlUO5Dwa-kDrzcbpDldxdjjirMuVHOYCfrd41qURGP2PAHkhKPUJlnZlI-n5rOw_mQoadIDxx6O_G0O5p0ryyyOPY3sRlc_ilpH4rRK5gthjQAqKhMDZPjm6fB4sJQMeNGrhm-pvcakc"/>
-<div class="absolute top-md left-md">
-<span class="bg-secondary-container text-on-secondary-container font-label-caps text-[10px] px-sm py-1 rounded-full uppercase tracking-widest border border-secondary">Intermediate</span>
-</div>
-</div>
-<div class="p-lg flex flex-col flex-grow gap-sm">
-<div class="flex justify-between items-center text-primary-fixed">
-<span class="material-symbols-outlined" data-weight="fill">public</span>
-<span class="font-code-md text-label-caps">10.0 HOURS</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Modern Web Exploitation</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                        Analyze and exploit modern web vulnerabilities including SSRF, XSS, and complex SQL injection scenarios.
-                    </p>
-<div class="pt-md border-t border-outline-variant mt-auto">
-<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded hover:opacity-90 neon-glow transition-all">ENROLL NOW</button>
-</div>
-</div>
-</div>
-<!-- Card 5 -->
-<div class="course-card glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300">
-<div class="h-48 relative overflow-hidden bg-surface-container-low">
-<img alt="Malware Analysis" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="Close-up of a high-tech glass screen showing complex binary code sequences with selective focus. Red alert icons are subtly visible in the background blur, suggesting a detected threat. The overall color palette is dominated by dark obsidian and electric blue, with small, intense red accents for warning signals." src="https://lh3.googleusercontent.com/aida/AP1WRLvZNjIG_DUJX5l36IcAwIjsYx1_094yUvsX5xYevVeMXc3C-nzlcfWP6BDzXsybAhVlYnwS2wB0fzTr1Wjtwrus8ebjvyfkv_-UzxNDhya9fyaQI3ptYMQsOVgfzbLJTPELRNlVkC85CqKC04fnWH2yn-zki5FBG6C9GEtWXzfdMjtk5uClQ4q30n4Az8VrfPd5C7LeyYKoMZd-gDvLwGLjOtbnbFxhujbLNEdrqIH9_D4TrqYlzfSTyg0"/>
-<div class="absolute top-md left-md">
-<span class="bg-error-container text-on-error-container font-label-caps text-[10px] px-sm py-1 rounded-full uppercase tracking-widest border border-error">Advanced</span>
-</div>
-</div>
-<div class="p-lg flex flex-col flex-grow gap-sm">
-<div class="flex justify-between items-center text-primary-fixed">
-<span class="material-symbols-outlined" data-weight="fill">bug_report</span>
-<span class="font-code-md text-label-caps">15.0 HOURS</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Reverse Engineering Malware</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                        Disassemble and analyze malicious binaries. Understand obfuscation techniques and develop effective detection signatures.
-                    </p>
-<div class="pt-md border-t border-outline-variant mt-auto">
-<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded hover:opacity-90 neon-glow transition-all">ENROLL NOW</button>
-</div>
-</div>
-</div>
-<!-- Card 6 -->
-<div class="course-card glass-panel rounded-xl overflow-hidden flex flex-col transition-all duration-300">
-<div class="h-48 relative overflow-hidden bg-surface-container-low">
-<img alt="Cloud Security" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-500" data-alt="Minimalist representation of cloud computing nodes, shown as glowing geometric cubes connected by laser-like light beams in a dark, atmospheric void. The style is clean and architectural, emphasizing a secure and expansive digital workspace. Lighting is atmospheric with soft blue glows and sharp focal points on the nodes." src="https://lh3.googleusercontent.com/aida/AP1WRLuhBmtX1vBfeXbFBFdYyxtUjb3Xhed7cAwPCH5olyfv_HWnvrqHcWIfES-54OP83QhoqZb34ViPQrDgO1WKRa4TFlFY7mWi_s3QP0Oc8T4sZ-sHkSHaz3Ikr0PQ0Q-awaGKlZuu9Lb9EZ5pxyvv1atBeQfG0lN0nyYImj_shULkejHq0OBgwJk80S3Bt-2pojNKuaB8nRQf58Gnxvpp-y2z8mHGtgpIuwPJPtLxblRDIqFpxQgxIQ03Cw"/>
-<div class="absolute top-md left-md">
-<span class="bg-surface-variant text-on-surface-variant font-label-caps text-[10px] px-sm py-1 rounded-full uppercase tracking-widest border border-outline">Beginner</span>
-</div>
-</div>
-<div class="p-lg flex flex-col flex-grow gap-sm">
-<div class="flex justify-between items-center text-primary-fixed">
-<span class="material-symbols-outlined" data-weight="fill">cloud_sync</span>
-<span class="font-code-md text-label-caps">5.5 HOURS</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Cloud Infrastructure Fundamentals</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">
-                        Secure your assets in AWS, Azure, and GCP. Understand shared responsibility models and identity access management.
-                    </p>
-<div class="pt-md border-t border-outline-variant mt-auto">
-<button class="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-md rounded hover:opacity-90 neon-glow transition-all">ENROLL NOW</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Pagination (Implicit) -->
-<div class="mt-xl flex justify-center items-center gap-md">
-<button class="glass-panel p-md rounded hover:text-primary transition-all disabled:opacity-50" disabled="">
-<span class="material-symbols-outlined">chevron_left</span>
-</button>
-<div class="flex gap-sm">
-<button class="w-10 h-10 bg-primary-container text-on-primary-container font-code-md rounded">1</button>
-<button class="w-10 h-10 glass-panel text-on-surface hover:border-primary transition-all font-code-md rounded">2</button>
-<button class="w-10 h-10 glass-panel text-on-surface hover:border-primary transition-all font-code-md rounded">3</button>
-</div>
-<button class="glass-panel p-md rounded hover:text-primary transition-all">
-<span class="material-symbols-outlined">chevron_right</span>
-</button>
-</div>
-</main>
-<!-- Footer -->
-<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline-variant full-width bottom-0">
-<div class="w-full py-xl px-gutter max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
-<div class="text-headline-sm font-headline-sm text-on-surface">
-                CYBER_ACADEMY
-            </div>
-<div class="flex gap-lg">
-<a class="text-on-surface-variant hover:text-primary dark:hover:text-primary-container transition-colors font-label-caps text-label-caps" href="#">Privacy Policy</a>
-<a class="text-on-surface-variant hover:text-primary dark:hover:text-primary-container transition-colors font-label-caps text-label-caps" href="#">Terms of Service</a>
-<a class="text-on-surface-variant hover:text-primary dark:hover:text-primary-container transition-colors font-label-caps text-label-caps" href="#">Legal</a>
-<a class="text-on-surface-variant hover:text-primary dark:hover:text-primary-container transition-colors font-label-caps text-label-caps" href="#">Contact</a>
-</div>
-<div class="text-body-sm font-body-sm text-on-surface-variant">
-                © 2024 CYBER_ACADEMY. SECURING THE FRONTIER.
-            </div>
-</div>
-</footer>
-<script>
-        // Micro-interactions for course cards
-        document.querySelectorAll('.course-card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                const img = card.querySelector('img');
-                if (img) img.style.transform = 'scale(1.05)';
-            });
-            card.addEventListener('mouseleave', () => {
-                const img = card.querySelector('img');
-                if (img) img.style.transform = 'scale(1)';
-            });
-        });
+{% block title %}
+CyberShield Academy — Courses
+{% endblock %}
 
-        // Search bar focus effect
-        const searchInput = document.querySelector('input[type="text"]');
-        searchInput.addEventListener('focus', () => {
-            searchInput.parentElement.classList.add('neon-glow');
-        });
-        searchInput.addEventListener('blur', () => {
-            searchInput.parentElement.classList.remove('neon-glow');
-        });
-    </script>
-</body></html>
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/training.css') }}"><br><br><br><br>
+
+<div class="courses-page">
+<div class="container">
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for cat, msg in messages %}
+          <div class="flash-msg flash-{{ cat }}">
+            {% if cat == 'success' %}✓{% elif cat == 'error' %}✗{% else %}ℹ{% endif %}
+            {{ msg }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="mission-tag">
+      <span class="pulse-dot"></span>
+      Mission Directive
+    </div>
+    <h1 class="page-title">Master Your <span>Mission</span></h1>
+    <p class="page-subtitle">
+      Deploy specialized training tracks designed for the modern operative. From perimeter defense to advanced offensive maneuvers — select your path and secure the digital frontier.
+    </p>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card" style="--sc:var(--accent-cyan);--sg:var(--accent-cyan-glow);">
+      <div class="stat-lbl">Total Courses</div>
+      <div class="stat-val">{{ stats.total }}</div>
+      <div class="stat-sub">Available tracks</div>
+      <div class="stat-bg-icon">◈</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--accent-green);--sg:rgba(0,255,136,.4);">
+      <div class="stat-lbl">Enrolled</div>
+      <div class="stat-val">{{ stats.enrolled }}</div>
+      <div class="stat-sub">Your courses</div>
+      <div class="stat-bg-icon">✓</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--accent-orange);--sg:rgba(255,157,0,.4);">
+      <div class="stat-lbl">In Progress</div>
+      <div class="stat-val">{{ stats.in_progress }}</div>
+      <div class="stat-sub">Active missions</div>
+      <div class="stat-bg-icon">◉</div>
+    </div>
+    <div class="stat-card" style="--sc:var(--accent-purple);--sg:rgba(123,47,255,.4);">
+      <div class="stat-lbl">Completed</div>
+      <div class="stat-val">{{ stats.completed }}</div>
+      <div class="stat-sub">Missions cleared</div>
+      <div class="stat-bg-icon">★</div>
+    </div>
+  </div>
+
+  <!-- Filter / Search Bar -->
+  <form method="GET" action="{{ url_for('courses') }}" class="filter-bar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        class="search-input"
+        type="text"
+        name="q"
+        value="{{ request.args.get('q', '') }}"
+        placeholder="Search operational courses..."
+        autocomplete="off"
+      >
+    </div>
+    <select class="filter-select" name="level" onchange="this.form.submit()">
+      <option value=""    {% if not request.args.get('level') %}selected{% endif %}>All Levels</option>
+      <option value="Beginner"     {% if request.args.get('level')=='Beginner'     %}selected{% endif %}>Beginner</option>
+      <option value="Intermediate" {% if request.args.get('level')=='Intermediate' %}selected{% endif %}>Intermediate</option>
+      <option value="Advanced"     {% if request.args.get('level')=='Advanced'     %}selected{% endif %}>Advanced</option>
+    </select>
+    <select class="filter-select" name="topic" onchange="this.form.submit()">
+      <option value="" {% if not request.args.get('topic') %}selected{% endif %}>All Topics</option>
+      <option value="Ethical Hacking"  {% if request.args.get('topic')=='Ethical Hacking'  %}selected{% endif %}>Ethical Hacking</option>
+      <option value="Cryptography"     {% if request.args.get('topic')=='Cryptography'     %}selected{% endif %}>Cryptography</option>
+      <option value="Digital Forensics"{% if request.args.get('topic')=='Digital Forensics'%}selected{% endif %}>Digital Forensics</option>
+      <option value="Web Security"     {% if request.args.get('topic')=='Web Security'     %}selected{% endif %}>Web Security</option>
+      <option value="Malware Analysis" {% if request.args.get('topic')=='Malware Analysis' %}selected{% endif %}>Malware Analysis</option>
+      <option value="Cloud Security"   {% if request.args.get('topic')=='Cloud Security'   %}selected{% endif %}>Cloud Security</option>
+    </select>
+  </form>
+
+  <!-- Courses Grid -->
+  <div class="section-header">
+    <span class="section-title">Training Tracks</span>
+    <div class="section-line"></div>
+    <span class="section-count">{{ pagination.total }} operations found</span>
+  </div>
+
+  <div class="courses-grid" id="coursesGrid">
+    {% for course in courses %}
+    {% set enrollment = enrolled_map.get(course.id) %}
+    <div class="course-card"
+         style="--card-top: {% if course.level=='Advanced' %}var(--accent-orange){% elif course.level=='Intermediate' %}#00b8ff{% else %}var(--accent-green){% endif %};">
+
+      <!-- Image -->
+      <div class="card-img">
+        {% if course.image_url %}
+          <img src="{{ course.image_url }}" alt="{{ course.title }}">
+        {% else %}
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:56px;opacity:.18;background:linear-gradient(135deg,#050d13,#0a1520);">
+            {% if course.level == 'Advanced' %}🔥{% elif course.level == 'Intermediate' %}⚡{% else %}🛡{% endif %}
+          </div>
+        {% endif %}
+        <div class="card-img-overlay"></div>
+        <div class="level-badge lvl-{{ course.level | lower }}">{{ course.level }}</div>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body">
+        <div class="card-meta-row">
+          <div class="card-icon">
+            {% if course.topic == 'Ethical Hacking' %}🔓
+            {% elif course.topic == 'Cryptography' %}🔐
+            {% elif course.topic == 'Digital Forensics' %}🔬
+            {% elif course.topic == 'Web Security' %}🌐
+            {% elif course.topic == 'Malware Analysis' %}🦠
+            {% elif course.topic == 'Cloud Security' %}☁
+            {% else %}⚙{% endif %}
+          </div>
+          <span class="card-duration">{{ course.duration }}</span>
+        </div>
+        <div class="card-title">{{ course.title }}</div>
+        <div class="card-desc">{{ course.description }}</div>
+        <div class="card-stats">
+          <div class="card-stat">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+            </svg>
+            <span class="val">{{ course.modules }}</span> modules
+          </div>
+          <div class="card-stat">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span class="val">{{ course.enrollment_count }}</span> enrolled
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer">
+        {% if enrollment %}
+          <div class="enroll-progress">
+            <div class="enroll-progress-lbl">
+              <span>Progress</span>
+              <span class="pct">{{ enrollment.progress }}%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:{{ enrollment.progress }}%"></div>
+            </div>
+          </div>
+          {% if enrollment.progress == 100 %}
+            <a href="{{ url_for('course_detail', course_id=course.id) }}"
+               class="btn-enroll btn-enroll-green">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Completed
+            </a>
+          {% else %}
+            <a href="{{ url_for('course_detail', course_id=course.id) }}"
+               class="btn-enroll btn-enroll-primary">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 3l14 9-14 9V3z"/>
+              </svg>
+              Continue
+            </a>
+          {% endif %}
+        {% else %}
+          <form method="POST" action="{{ url_for('enroll_course', course_id=course.id) }}">
+            <button type="submit" class="btn-enroll btn-enroll-outline">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              Enroll Now
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">⚙</div>
+      No courses match your filters. Try adjusting your search.
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if pagination and pagination.pages > 1 %}
+  <div class="pagination">
+    {% if pagination.has_prev %}
+      <a href="{{ url_for('courses', page=pagination.prev_num, q=request.args.get('q',''), level=request.args.get('level',''), topic=request.args.get('topic','')) }}"
+         class="page-btn">‹</a>
+    {% else %}
+      <span class="page-btn" style="opacity:.3;cursor:default;">‹</span>
+    {% endif %}
+
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        <a href="{{ url_for('courses', page=p, q=request.args.get('q',''), level=request.args.get('level',''), topic=request.args.get('topic','')) }}"
+           class="page-btn {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
+      {% else %}
+        <span class="page-btn" style="cursor:default;">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+      <a href="{{ url_for('courses', page=pagination.next_num, q=request.args.get('q',''), level=request.args.get('level',''), topic=request.args.get('topic','')) }}"
+         class="page-btn">›</a>
+    {% else %}
+      <span class="page-btn" style="opacity:.3;cursor:default;">›</span>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div><!-- /container -->
+</div><!-- /courses-page -->
+
+{% endblock %}

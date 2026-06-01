@@ -6,22 +6,31 @@
     </div>
 
     <nav>
-        <a href="/">Home</a>
-        <a href="#">Training</a>
+
+        {% if session.get('user_id') %}
+        <a href="/dashboard">Dashboard</a>
+        <a href="/courses">Training</a>
+        <a href="/labs">Labs</a>
         <a href="#">Programs</a>
         <a href="/about">About</a>
         <a href="/contact">Contact</a>
+        {% else %}
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        {% endif %}
+
     </nav>
 
-    
-       {% if session.get('user_id') %}
+
+    {% if session.get('user_id') %}
     <button class="nav-btn" onclick="window.location.href='{{ url_for('logout') }}'">
         Logout
     </button>
-{% else %}
+    {% else %}
     <button class="nav-btn" onclick="window.location.href='{{ url_for('register') }}'">
         Get Started
     </button>
-{% endif %}
+    {% endif %}
 
 </header>
