@@ -13,8 +13,15 @@
         <a href="/contact">Contact</a>
     </nav>
 
-    <button class="nav-btn">
+    
+       {% if session.get('user_id') %}
+    <button class="nav-btn" onclick="window.location.href='{{ url_for('logout') }}'">
+        Logout
+    </button>
+{% else %}
+    <button class="nav-btn" onclick="window.location.href='{{ url_for('register') }}'">
         Get Started
     </button>
+{% endif %}
 
 </header>

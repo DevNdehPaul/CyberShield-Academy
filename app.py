@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, ContactMessage
-
+from flask import (
+    Flask, render_template, request,
+    redirect, url_for, flash, session
+)
+from models import db, User, ContactMessage
+from functools import wraps
 app = Flask(__name__)
 
 # ── Config ──
@@ -15,7 +18,15 @@ with app.app_context():
     db.create_all()  
 
 # ── Routes ──
-
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please log in to access this page.', 'error')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated
+  
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -68,13 +79,104 @@ def contact():
 
     return render_template('contact.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login_signup.html')
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
 
-@app.route('/signup')
-def signup():
-    return render_template('login_signup.html')
+    if request.method == 'POST':
+        email    = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        if not email or not password:
+            flash('Please enter your email and password.', 'error')
+            return redirect(url_for('login'))
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user or not user.check_password(password):
+            flash('Invalid credentials. Access denied.', 'error')
+            return redirect(url_for('login'))
+
+        if not user.is_active:
+            flash('This account has been deactivated.', 'error')
+            return redirect(url_for('login'))
+
+        # ✅ Save session
+        session['user_id']   = user.id
+        session['user_name'] = f'{user.first_name} {user.last_name}'
+        session['user_role'] = user.role
+        session['user_email']= user.email
+
+        flash(f'Welcome back, {user.first_name}. Session initialized.', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('login_signup.html', mode='login')
+
+# ── Register ──
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        first_name       = request.form.get('first_name', '').strip()
+        last_name        = request.form.get('last_name', '').strip()
+        email            = request.form.get('email', '').strip().lower()
+        password         = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        role             = request.form.get('role', 'student')
+
+        # ── Validation ──
+        errors = []
+
+        if not first_name:
+            errors.append('First name is required.')
+        if not last_name:
+            errors.append('Last name is required.')
+        if not email or '@' not in email:
+            errors.append('A valid email is required.')
+        if len(password) < 8:
+            errors.append('Password must be at least 8 characters.')
+        if password != confirm_password:
+            errors.append('Passwords do not match.')
+        if User.query.filter_by(email=email).first():
+            errors.append('An account with this email already exists.')
+
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('register'))
+
+        # ✅ Create user
+        new_user = User(
+            first_name = first_name,
+            last_name  = last_name,
+            email      = email,
+            role       = role
+        )
+        new_user.set_password(password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Account created successfully. You can now log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('login_signup.html', mode='register')
+
+# ── Logout ──
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Session terminated. You have been logged out.', 'success')
+    return redirect(url_for('login'))
+
+# # ── Dashboard (protected) ──
+# @app.route('/dashboard')
+# @login_required
+# def dashboard():
+#     return render_template('dashboard.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

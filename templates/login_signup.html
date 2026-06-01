@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block title %}Authentication — CyberShield Academy{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login_signup.css') }}"><br><br><br>
+
+<div class="auth-page">
+
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="auth-header">
+      <h1>Authentication</h1>
+      <p>Access the secure environment gateway.</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button class="tab-btn {{ 'tab-active' if mode == 'login' else '' }}"
+        onclick="window.location.href='{{ url_for('login') }}'">
+        LOGIN
+      </button>
+      <button class="tab-btn {{ 'tab-active' if mode == 'register' else '' }}"
+        onclick="window.location.href='{{ url_for('register') }}'">
+        CREATE ACCOUNT
+      </button>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            {% if category == 'success' %}✓{% else %}⚠{% endif %}
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- LOGIN FORM -->
+    {% if mode == 'login' %}
+    <form class="auth-form" method="POST" action="{{ url_for('login') }}">
+
+      <div class="form-group">
+        <label>AUTHORIZATION LEVEL</label>
+        <div class="select-wrap">
+          <select name="role">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="admin">Admin</option>
+          </select>
+          <span class="select-chevron">⌄</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>IDENTIFIER (EMAIL)</label>
+        <div class="input-wrap">
+          <span class="input-icon">@</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="agent@cybershield.io"
+            required
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ENCRYPTION KEY (PASSWORD)</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            name="password"
+            id="loginPassword"
+            placeholder="••••••••••••"
+            required
+            autocomplete="current-password"
+          />
+          <span class="toggle-pw" onclick="togglePw('loginPassword', this)">👁</span>
+        </div>
+      </div>
+
+      <div class="forgot-row">
+        <a href="#" class="forgot-link">Forgot Password?</a>
+      </div>
+
+      <button class="btn-submit" type="submit">
+        <span class="btn-icon">🛡</span>
+        INITIALIZE SECURE SESSION
+      </button>
+
+    </form>
+    {% endif %}
+
+    <!-- REGISTER FORM -->
+    {% if mode == 'register' %}
+    <form class="auth-form" method="POST" action="{{ url_for('register') }}">
+
+      <div class="form-group">
+        <label>AUTHORIZATION LEVEL</label>
+        <div class="select-wrap">
+          <select name="role">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
+          <span class="select-chevron">⌄</span>
+        </div>
+      </div>
+
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>FIRST NAME</label>
+          <div class="input-wrap">
+            <span class="input-icon">◈</span>
+            <input
+              type="text"
+              name="first_name"
+              placeholder="Alex"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>LAST NAME</label>
+          <div class="input-wrap">
+            <span class="input-icon">◈</span>
+            <input
+              type="text"
+              name="last_name"
+              placeholder="Cipher"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>IDENTIFIER (EMAIL)</label>
+        <div class="input-wrap">
+          <span class="input-icon">@</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="agent@cybershield.io"
+            required
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>ENCRYPTION KEY (PASSWORD)</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            name="password"
+            id="regPassword"
+            placeholder="Min. 8 characters"
+            required
+            minlength="8"
+            autocomplete="new-password"
+          />
+          <span class="toggle-pw" onclick="togglePw('regPassword', this)">👁</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>CONFIRM ENCRYPTION KEY</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            name="confirm_password"
+            id="regConfirm"
+            placeholder="Repeat password"
+            required
+            autocomplete="new-password"
+          />
+          <span class="toggle-pw" onclick="togglePw('regConfirm', this)">👁</span>
+        </div>
+      </div>
+
+      <button class="btn-submit" type="submit">
+        <span class="btn-icon">🛡</span>
+        CREATE SECURE ACCOUNT
+      </button>
+
+    </form>
+    {% endif %}
+
+    <!-- Federated -->
+    <div class="federated-section">
+      <div class="fed-divider">
+        <span>FEDERATED ACCESS</span>
+      </div>
+      <div class="fed-buttons">
+        <a href="#" class="fed-btn">
+          <span class="fed-icon">⬡</span> GITHUB
+        </a>
+        <a href="#" class="fed-btn">
+          <span class="fed-icon">◉</span> GOOGLE
+        </a>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-icon">🛡</span>
+      Encrypted connection active. System status:
+      <strong class="status-ok">OPERATIONAL</strong>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function togglePw(inputId, icon) {
+    const input = document.getElementById(inputId);
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    icon.style.opacity = isPassword ? '1' : '0.4';
+  }
+</script>
+
+{% endblock %}
