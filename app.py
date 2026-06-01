@@ -2,14 +2,13 @@ from flask import (
     Flask, render_template, request,
     redirect, url_for, flash, session
 )
-from models import db, User, ContactMessage, Enrollment, Course
+from models import db, User, ContactMessage, Enrollment, Course, Lab, LabProgress, LiveEvent
 from functools import wraps
 from datetime import datetime
 from flask_migrate import Migrate
 
-
 app = Flask(__name__)
-app.config['SECRET_KEY']                     = 'change-this-to-a-very-strong-secret-key'
+app.config['SECRET_KEY']                     = 'TabShama2014&TabPenel2016&TabRussel2018&TabQueency2020&'
 app.config['SQLALCHEMY_DATABASE_URI']        = 'sqlite:///cybershield.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 migrate = Migrate(app, db)
@@ -22,7 +21,6 @@ with app.app_context():
 ADMIN_EMAIL    = 'admin@cybershield.io'
 ADMIN_PASSWORD = 'CyberAdmin#2025'
 
-# ── Auth decorators ──
 
 def login_required(f):
     @wraps(f)
@@ -41,6 +39,60 @@ def admin_required(f):
             return redirect(url_for('student_dashboard'))
         return f(*args, **kwargs)
     return decorated
+
+def _enrich_labs(labs):
+    """Attach .user_progress to every lab for the current session user."""
+    if 'user_id' not in session or session.get('user_role') == 'admin':
+        for lab in labs:
+            lab.user_progress = None
+        return labs
+
+    lab_ids = [lab.id for lab in labs]
+    progress_map = {
+        p.lab_id: p
+        for p in LabProgress.query.filter(
+            LabProgress.user_id == session['user_id'],
+            LabProgress.lab_id.in_(lab_ids)
+        ).all()
+    }
+    for lab in labs:
+        lab.user_progress = progress_map.get(lab.id)
+    return labs
+
+def _labs_stats():
+    """Return stat-card numbers for the labs page."""
+    total_labs = Lab.query.filter_by(is_active=True).count()
+    if 'user_id' not in session or session.get('user_role') == 'admin':
+        return dict(total_labs=total_labs, completed=0, in_progress=0, xp_earned=0)
+
+    all_prog = LabProgress.query.filter_by(user_id=session['user_id']).all()
+    return dict(
+        total_labs  = total_labs,
+        completed   = sum(1 for p in all_prog if p.completed),
+        in_progress = sum(1 for p in all_prog if not p.completed and p.percent > 0),
+        xp_earned   = sum(p.xp_awarded for p in all_prog if p.completed),
+    )
+
+def _course_stats():
+    """Stat-card numbers for the courses page."""
+    total = Course.query.count()
+    if 'user_id' not in session or session.get('user_role') == 'admin':
+        return dict(total=total, enrolled=0, in_progress=0, completed=0)
+
+    all_enroll = Enrollment.query.filter_by(user_id=session['user_id']).all()
+    return dict(
+        total       = total,
+        enrolled    = len(all_enroll),
+        in_progress = sum(1 for e in all_enroll if 0 < e.progress < 100),
+        completed   = sum(1 for e in all_enroll if e.progress == 100),
+    )
+
+def _enrolled_map():
+    """Return {course_id: Enrollment} for the logged-in student."""
+    if 'user_id' not in session or session.get('user_role') == 'admin':
+        return {}
+    rows = Enrollment.query.filter_by(user_id=session['user_id']).all()
+    return {e.course_id: e for e in rows}
 
 # ── Home ──
 @app.route('/')
@@ -239,46 +291,6 @@ def contact():
 
     return render_template('contact.html')
 
-
-from models import Lab, LabProgress, LiveEvent   # add these to models.py
-
-# ── helpers ──
-
-def _enrich_labs(labs):
-    """Attach .user_progress to every lab for the current session user."""
-    if 'user_id' not in session or session.get('user_role') == 'admin':
-        for lab in labs:
-            lab.user_progress = None
-        return labs
-
-    lab_ids = [lab.id for lab in labs]
-    progress_map = {
-        p.lab_id: p
-        for p in LabProgress.query.filter(
-            LabProgress.user_id == session['user_id'],
-            LabProgress.lab_id.in_(lab_ids)
-        ).all()
-    }
-    for lab in labs:
-        lab.user_progress = progress_map.get(lab.id)
-    return labs
-
-
-def _labs_stats():
-    """Return stat-card numbers for the labs page."""
-    total_labs = Lab.query.filter_by(is_active=True).count()
-    if 'user_id' not in session or session.get('user_role') == 'admin':
-        return dict(total_labs=total_labs, completed=0, in_progress=0, xp_earned=0)
-
-    all_prog = LabProgress.query.filter_by(user_id=session['user_id']).all()
-    return dict(
-        total_labs  = total_labs,
-        completed   = sum(1 for p in all_prog if p.completed),
-        in_progress = sum(1 for p in all_prog if not p.completed and p.percent > 0),
-        xp_earned   = sum(p.xp_awarded for p in all_prog if p.completed),
-    )
-
-
 # ── Labs listing ──
 @app.route('/labs')
 def labs():
@@ -306,7 +318,6 @@ def labs():
         live_event  = live_event,
         stats       = _labs_stats(),
     )
-
 
 # ── Launch / deploy a lab ──
 @app.route('/labs/<int:lab_id>/launch')
@@ -336,7 +347,6 @@ def launch_lab(lab_id):
         return redirect(lab.env_url)
     return redirect(url_for('labs'))
 
-
 # ── Join live event ──
 @app.route('/labs/event/<int:event_id>/join')
 @login_required
@@ -357,13 +367,11 @@ def join_event(event_id):
 
     return redirect(url_for('labs'))
 
-
 # ── Event briefing ──
 @app.route('/labs/event/<int:event_id>/briefing')
 def event_briefing(event_id):
     event = LiveEvent.query.get_or_404(event_id)
     return render_template('labs_briefing.html', event=event)
-
 
 # ── Admin: create lab ──
 @app.route('/admin/labs/create', methods=['GET', 'POST'])
@@ -399,7 +407,6 @@ def admin_create_lab():
 
     return render_template('admin/lab_form.html')
 
-
 # ── Admin: delete (deactivate) lab ──
 @app.route('/admin/labs/<int:lab_id>/delete', methods=['POST'])
 @login_required
@@ -410,7 +417,6 @@ def admin_delete_lab(lab_id):
     db.session.commit()
     flash(f'Lab "{lab.title}" deactivated.', 'success')
     return redirect(url_for('labs'))
-
 
 # ── Admin: create live event ──
 @app.route('/admin/labs/event/create', methods=['GET', 'POST'])
@@ -443,32 +449,6 @@ def admin_create_event():
         return redirect(url_for('labs'))
 
     return render_template('admin/event_form.html')
-
-
-# ── helpers ──
-
-def _course_stats():
-    """Stat-card numbers for the courses page."""
-    total = Course.query.count()
-    if 'user_id' not in session or session.get('user_role') == 'admin':
-        return dict(total=total, enrolled=0, in_progress=0, completed=0)
-
-    all_enroll = Enrollment.query.filter_by(user_id=session['user_id']).all()
-    return dict(
-        total       = total,
-        enrolled    = len(all_enroll),
-        in_progress = sum(1 for e in all_enroll if 0 < e.progress < 100),
-        completed   = sum(1 for e in all_enroll if e.progress == 100),
-    )
-
-
-def _enrolled_map():
-    """Return {course_id: Enrollment} for the logged-in student."""
-    if 'user_id' not in session or session.get('user_role') == 'admin':
-        return {}
-    rows = Enrollment.query.filter_by(user_id=session['user_id']).all()
-    return {e.course_id: e for e in rows}
-
 
 # ── Courses listing ──
 @app.route('/courses')
@@ -506,7 +486,6 @@ def courses():
         stats        = _course_stats(),
     )
 
-
 # ── Course detail (placeholder — customise as needed) ──
 @app.route('/courses/<int:course_id>')
 def course_detail(course_id):
@@ -517,7 +496,6 @@ def course_detail(course_id):
             user_id=session['user_id'], course_id=course_id
         ).first()
     return render_template('course_detail.html', course=course, enrollment=enrollment)
-
 
 # ── Enroll in a course ──
 @app.route('/courses/<int:course_id>/enroll', methods=['POST'])
@@ -547,7 +525,6 @@ def enroll_course(course_id):
     flash(f'Enrolled in "{course.title}". Mission accepted.', 'success')
     return redirect(url_for('courses'))
 
-
 # ── Update course progress (called from course detail / lesson pages) ──
 @app.route('/courses/<int:course_id>/progress', methods=['POST'])
 @login_required
@@ -566,7 +543,6 @@ def update_progress(course_id):
         db.session.commit()
 
     return redirect(url_for('course_detail', course_id=course_id))
-
 
 # ── Admin: create course ──
 @app.route('/admin/courses/create', methods=['GET', 'POST'])
@@ -598,7 +574,6 @@ def admin_create_course():
 
     return render_template('admin/course_form.html')
 
-
 # ── Admin: edit course ──
 @app.route('/admin/courses/<int:course_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -619,7 +594,6 @@ def admin_edit_course(course_id):
         return redirect(url_for('courses'))
 
     return render_template('admin/course_form.html', course=course)
-
 
 # ── Admin: delete course ──
 @app.route('/admin/courses/<int:course_id>/delete', methods=['POST'])
